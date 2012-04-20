@@ -245,12 +245,12 @@ def restful():
         def f(_action=action,_self=self,*a,**b):
             self.is_restful = True
             method = _self.env.request_method or 'GET'
-            if not method == 'GET' and not current.request.ajax and current.request.cid:
-                method = 'GET'
             if len(_self.args) and '.' in _self.args[-1]:
                 _self.args[-1],_self.extension = _self.args[-1].rsplit('.',1)
                 current.response.headers['Content-Type'] = \
                     contenttype(_self.extension.lower())
+            if not method == 'GET' and not current.request.ajax and current.request.cid:
+                method = 'GET'
             if not method in ['GET','POST','DELETE','PUT']:
                 raise HTTP(400,"invalid method")
             rest_action = _action().get(method,None)
@@ -294,4 +294,3 @@ def progressive_enhance():
         else:
             return action
     return wrapper
-
