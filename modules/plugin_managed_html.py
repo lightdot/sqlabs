@@ -268,10 +268,21 @@ class ManagedHTML(object):
                 
         _files = [
             URL(APP, 'static', 'plugin_managed_html/managed_html.css'),
+            URL('static', 'plugin_bootstrap2/bootstrap.min.css'),
+            URL('static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
+            URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/jquery-ui-1.8.16.custom.min.js'),
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
-        ]
+            URL('static', 'plugin_smarteditor_widget/underscore.js'),
+            URL('static', 'plugin_smarteditor_widget/backbone.js'),
+            URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
+            URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor.css'),
+            ]
         response.files[:0] = [f for f in _files if f not in response.files]
             
     def _show_page_grid_js(self):
@@ -551,9 +562,10 @@ if(filename != "") {
     def _post_js(self, target, name, action, **attrs):
         data = {self.keyword: name, '_action': action}
         data.update(**attrs)
-        return 'managed_html_ajax_page("%(url)s", %(data)s, "%(target)s");' % dict(
-                          url=URL(args=current.request.args),  # , vars=current.request.get_vars
-                          data=json.dumps(data), target=target)
+#        return 'managed_html_ajax_page("%(url)s", %(data)s, "%(target)s");' % dict(
+#                          url=URL(args=current.request.args),  # , vars=current.request.get_vars
+#                          data=json.dumps(data), target=target)
+        return ''
        
     def _post_content_js(self, name, action, **attrs):
         return self._post_js('managed_html_content_%s' % name, name, action, **attrs)
@@ -793,10 +805,10 @@ jQuery(function(){
                     response.write(XML('<div class="%s">&nbsp;</div>' %
                                         ('managed_html_collection_anchor' if collection and collection.publish_on
                                             else 'managed_html_collection_anchor_pending')))
-                    response.write(XML("""
-<script>jQuery(function(){managed_html_move("%s", "%s", "%s", "%s")})</script>""" %
-                            (name, self.keyword, URL(args=request.args),  # , vars=request.get_vars
-                             current.T('Sure you want to move them?'))))
+#                    response.write(XML("""
+#<script>jQuery(function(){managed_html_move("%s", "%s", "%s", "%s")})</script>""" %
+#                            (name, self.keyword, URL(args=request.args),  # , vars=request.get_vars
+#                             current.T('Sure you want to move them?'))))
                     response.write(XML('</div></div>'))
             
             if (EDIT_MODE in self.view_mode and request.ajax and
