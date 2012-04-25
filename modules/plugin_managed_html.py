@@ -280,6 +280,7 @@ class ManagedHTML(object):
             URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.css'),
             ]
