@@ -83,20 +83,20 @@ jQuery.extend(jQuery.easing,
 
 function managed_html_init_blocks() {
 
-  // ---------------------------------------------------------------------------
-  // block events
-  // ---------------------------------------------------------------------------
-  jQuery('.managed_html_content_block').hover(function(e){
-    managed_html_show_content_ctrl(jQuery(this));
-  }, function(e) {
-    jQuery(this).children('.managed_html_content_ctrl').hide();
-  });
-  
-  jQuery('.managed_html_collection_anchor, .managed_html_collection_anchor_pending, .managed_html_collection_ctrl').hover(function(){
-    managed_html_show_collection_ctrl(jQuery(this).closest('.managed_html_collection_block'));
-  }, function() {
-    jQuery(this).closest('.managed_html_collection_block').children('.managed_html_collection_ctrl').hide();
-  });
+//  // ---------------------------------------------------------------------------
+//  // block events
+//  // ---------------------------------------------------------------------------
+//  jQuery('.managed_html_content_block').hover(function(e){
+//    managed_html_show_content_ctrl(jQuery(this));
+//  }, function(e) {
+//    jQuery(this).children('.managed_html_content_ctrl').hide();
+//  });
+//  
+//  jQuery('.managed_html_collection_anchor, .managed_html_collection_anchor_pending, .managed_html_collection_ctrl').hover(function(){
+//    managed_html_show_collection_ctrl(jQuery(this).closest('.managed_html_collection_block'));
+//  }, function() {
+//    jQuery(this).closest('.managed_html_collection_block').children('.managed_html_collection_ctrl').hide();
+//  });
   
 }
 
