@@ -689,6 +689,13 @@ jQuery(function(){
                     response.body = cStringIO.StringIO()
                     _func(content)
                     raise HTTP(200, response.body.getvalue())
+
+                elif action in ('inline_edit'):
+                    content = self._get_content(name)
+                    data = content and content.data and json.loads(content.data) or {}
+                    print content.data
+                    print data['handlebars']
+                    raise HTTP(200, data['handlebars'])
                    
                 else:
                     raise RuntimeError
