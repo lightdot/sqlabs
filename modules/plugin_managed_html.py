@@ -603,13 +603,14 @@ jQuery(function(){
                     
             if (EDIT_MODE in self.view_mode and request.ajax and
                     self.keyword in request.vars and request.vars[self.keyword] == name):
-                    
+                
                 import cStringIO
                 action = request.vars.get('_action')
+                
                 if action in ('edit', 'revert'):
                     if not settings.editable:
                         raise HTTP(400)
-                        
+                    
                     if action == 'revert':
                         response.flash = T('Reverted')
                         content = self._get_content(name, id=request.vars.content_id)
@@ -631,16 +632,15 @@ jQuery(function(){
                             field.widget = field.widget or self.text_widget
                             field.requires = IS_HTML()
                             
-                            # if field.name in request.vars:
-                                # from plugin_elrte_widget import strip
-                                # request.vars[field.name] = strip(request.vars[field.name])
-        
                         elif field.type.startswith('list:'):
                             if field.name + '[]' in request.vars:
                                 request.vars[field.name] = [v for v in request.vars[field.name + '[]'] if v]
                                 if field.type == 'list:integer' or field.type.startswith('list:reference'):
                                     request.vars[field.name] = map(int, request.vars[field.name])
                             
+                        if field.name == 'handlebars':
+                            virtual_record[field.name] = self.convert_handlebars(name, virtual_record[field.name])
+
                     form = SQLFORM(
                         DAL(None).define_table('no_table', *fields),
                         virtual_record,
@@ -653,26 +653,26 @@ jQuery(function(){
                         for field in fields:
                             field_value = form.vars[field.name]
                             data[field.name] = field_value
-                            
+
                         table_content = settings.table_content
                         self.db(table_content.name == name)(table_content.publish_on == None).delete()
                         table_content.insert(name=name, data=json.dumps(data))
-                        content = self._get_content(name)
                         
                         response.flash = T('Edited')
                         response.js = 'managed_html_published("%s", false);' % el_id
                         response.js += 'managed_html_editing("%s", false);' % el_id
+                        response.js += 'managed_html_editing("%s", false);' % el_id
                         
-                        response.body = cStringIO.StringIO()
-                        _func(content)
-                        raise HTTP(200, response.body.getvalue())
+                        raise HTTP(200, '')
                         
                     if len(fields) == 1:
                         form.components = [form.custom.widget[fields[0].name]]
                         
                     form.components += [INPUT(_type='hidden', _name=self.keyword, _value=name),
                                INPUT(_type='hidden', _name='_action', _value='edit')]
-                    raise HTTP(200, DIV(form, _class='managed_html_content_inner'))
+                    content = self._get_content(name)
+                    
+                    raise HTTP(200, DIV(form, _style='display:none;'))
                     
                 elif action in ('back', 'publish_now'):
                     content = self._get_content(name)
@@ -690,13 +690,9 @@ jQuery(function(){
                     _func(content)
                     raise HTTP(200, response.body.getvalue())
 
-                elif action in ('inline_edit'):
-                    content = self._get_content(name)
-                    data = content and content.data and json.loads(content.data) or {}
-                    print content.data
-                    print data['handlebars']
-                    raise HTTP(200, data['handlebars'])
-                   
+                elif action in ('unique_key'):
+                    from gluon.utils import web2py_uuid
+                    raise HTTP(200, web2py_uuid())
                 else:
                     raise RuntimeError
                 
@@ -988,3 +984,14 @@ jQuery(function(){
                     response.write(XML('</div>'))
             return wrapper
         return _decorator
+    
+    def convert_handlebars(self, name, html):
+        from BeautifulSoup import BeautifulSoup, Tag
+        contents = BeautifulSoup(html, fromEncoding="utf-8")
+        i = 0
+        for content in contents:
+            if isinstance(content, Tag):
+                content['handlebars_id'] = '%s_%s'%(name, i)
+                content['class'] = 'handlebars_content_block'
+                i = i + 1
+        return unicode(str(contents))
