@@ -548,7 +548,7 @@ if(filename != "") {
     if (kind == 'elfinder') {
         data = '<a href="'+data+'" >FILE</a>';
     }
-    callback(data); jQuery('.managed_html_dialog').hide();
+    callback(data); jQuery('#managed_html_image_chooser, #managed_html_file_chooser').hide();
 }});
 }""" % (file_chooser.show(),
         image_chooser.show(), self.settings.upload('__filename__'))  # TODO setting for managed_html_file_selected
@@ -677,7 +677,7 @@ jQuery(function(){
                     content = self._get_content(name)
                     
                     raise HTTP(200, DIV(form))
-                    
+                
                 elif action in ('back', 'publish_now'):
                     content = self._get_content(name)
                     if action == 'publish_now':
