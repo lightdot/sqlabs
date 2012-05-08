@@ -276,6 +276,7 @@ class ManagedHTML(object):
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
             URL('static', 'plugin_smarteditor_widget/underscore.js'),
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
+            URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
@@ -659,6 +660,13 @@ jQuery(function(){
                         for field in fields:
                             field_value = form.vars[field.name]
                             data[field.name] = field_value
+                            if field.name == 'handlebars':
+                                if field_value:
+                                    from pybars import Compiler
+                                    tree = Compiler._get_handlebars_template()(field_value.decode('utf-8', 'ignore')).apply('template')[0]
+                                else:
+                                    tree = None
+                                data['handlebars_tree'] = tree
 
                         table_content = settings.table_content
                         self.db(table_content.name == name)(table_content.publish_on == None).delete()
