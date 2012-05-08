@@ -48,11 +48,16 @@ jQuery.extend(jQuery.easing,
     $('body, #main').css({'width':'{{=current_device['view_width']}}px', 'min-width':'{{=current_device['view_width']}}px', 'margin':'0px 20px 0px 20px'});
     $('#base').css({'position':'absolute'});
     {{ if is_edit_mode:}}
-      var reference_view = $('<div id="managed_reference_view"></div>').css('left', '{{=int(current_device['view_width']) + 40}}px');
+      var reference_view = $('<div id="managed_reference_view"></div>'
+                              ).css('left', '{{=int(current_device['view_width']) + 40}}px');
       var reference_view_content = $('<div id="managed_reference_view_content">');
       reference_view.append(reference_view_content);
       $('body').prepend(reference_view);
-      managed_html_web2py_ajax_page('post', '{{=reference_url}}', {'_action':'reference'}, 'managed_reference_view_content');
+      managed_html_web2py_ajax_page('post', '{{=reference_url}}', 
+                                    {'_action':'reference'}, 
+                                    'managed_reference_view_content',
+                                    null,
+                                    true);
     {{pass}}
   {{pass}}
   var secondary_nav = $('<ul class="managed_html_secondary_nav"></ul>');
@@ -142,7 +147,7 @@ function managed_html_web2py_trap_form(action,target) {
       });
    });
 }
-function managed_html_web2py_ajax_page(method,action,data,target,callback) {
+function managed_html_web2py_ajax_page(method,action,data,target,callback,escape) {
   jQuery.ajax({'type':method,'url':action,'data':data,
     'beforeSend':function(xhr) {
       jQuery('#'+target).managed_html_spinner();
@@ -156,6 +161,9 @@ function managed_html_web2py_ajax_page(method,action,data,target,callback) {
       var content=xhr.getResponseHeader('web2py-component-content'); 
       var command=xhr.getResponseHeader('web2py-component-command');
       var flash=xhr.getResponseHeader('web2py-component-flash');
+      
+      if (escape == true) {html = html.split("document.write").join("");}
+
       var t = jQuery('#'+target);
       if(content=='prepend') t.prepend(html); 
       else if(content=='append') t.append(html);
