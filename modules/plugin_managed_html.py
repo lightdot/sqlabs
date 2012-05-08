@@ -269,18 +269,18 @@ class ManagedHTML(object):
         _files = [
             URL(APP, 'static', 'plugin_managed_html/managed_html.css'),
             URL('static', 'plugin_bootstrap2/bootstrap.min.css'),
+            URL('static', 'plugin_bootstrap2/bootstrap.min.js'),
             URL('static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
-            URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/jquery-ui-1.8.16.custom.min.js'),
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
             URL('static', 'plugin_smarteditor_widget/underscore.js'),
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
-            URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
-            URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
+            URL('static', 'plugin_smarteditor_widget/font_size.js'),
+            URL('static', 'plugin_smarteditor_widget/nytpanel_models.editor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.css'),
             ]
@@ -608,6 +608,7 @@ jQuery(function(){
                 action = request.vars.get('_action')
                 
                 if action in ('edit', 'revert'):
+                    
                     if not settings.editable:
                         raise HTTP(400)
                     
@@ -641,6 +642,10 @@ jQuery(function(){
                         if field.name == 'handlebars':
                             virtual_record[field.name] = self.convert_handlebars(name, virtual_record[field.name])
 
+                        if request.vars['dummy_form']:
+                            field.widget = self.text_widget
+                            field.requires = IS_HTML()
+                            
                     form = SQLFORM(
                         DAL(None).define_table('no_table', *fields),
                         virtual_record,
@@ -648,6 +653,7 @@ jQuery(function(){
                         showid=False,
                         buttons=[],
                     )
+                    
                     if form.accepts(request.vars, session, formname='managed_html_content_form_%s' % name):
                         data = {}
                         for field in fields:
@@ -1016,13 +1022,15 @@ jQuery(function(){
         return _decorator
     
     def convert_handlebars(self, name, html):
+        if not html:
+            return ''
         from BeautifulSoup import BeautifulSoup, Tag
         contents = BeautifulSoup(html, fromEncoding="utf-8")
         
         i = 0
-        for content in contents.findAll(["div"]):
+        for content in contents.findAll():
             if isinstance(content, Tag):
                 content['handlebars_id'] = '%s_%s'%(name, i)
-                content['class'] = 'handlebars_content_block'
+                content['class'] = ' '.join(['handlebars_content_block',content.get('class', '')])
                 i = i + 1
         return unicode(str(contents))
