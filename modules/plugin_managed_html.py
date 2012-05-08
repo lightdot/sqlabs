@@ -1033,4 +1033,4 @@ jQuery(function(){
                 content['handlebars_id'] = '%s_%s'%(name, i)
                 content['class'] = ' '.join(['handlebars_content_block',content.get('class', '')])
                 i = i + 1
-        return unicode(str(contents))
+        return str(contents).decode('utf-8', 'ignore')
