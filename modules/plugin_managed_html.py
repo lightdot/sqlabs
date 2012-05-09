@@ -7,6 +7,7 @@ from gluon.validators import Validator
 import gluon.contrib.simplejson as json
 # from plugin_uploadify_widget import IS_UPLOADIFY_IMAGE as IS_IMAGE
 # from plugin_uploadify_widget import IS_UPLOADIFY_LENGTH as IS_LENGTH
+from pybars import Compiler
 
 # For referencing static and views from other application
 import os
@@ -85,6 +86,9 @@ class ManagedHTML(object):
         settings.editable = True
         settings.publishable = True
         
+        settings._handlebars_compiler = Compiler(current.response)
+        settings._handlebars_stack = []
+
         def _html(name, parent=None):
             @self.content_block(name, Field('html', 'text'), parent=parent)
             def _(content):
@@ -602,7 +606,7 @@ jQuery(function(){
                     if len(response.body.getvalue()) == _body_len:
                         response.write(XML("<div class='managed_html_empty_content' >&nbsp;</div>"))
                     response.write(XML('</div>'))
-                    
+            
             if (EDIT_MODE in self.view_mode and request.ajax and
                     self.keyword in request.vars and request.vars[self.keyword] == name):
                 
@@ -672,11 +676,14 @@ jQuery(function(){
                         table_content = settings.table_content
                         self.db(table_content.name == name)(table_content.publish_on == None).delete()
                         table_content.insert(name=name, data=json.dumps(data))
+                        content = self._get_content(name)
                         
                         response.flash = T('Edited')
-                        response.js = 'window.location.reload();'
                         
-                        raise HTTP(200, '')
+                        response.body = cStringIO.StringIO()
+                        _func(content)
+                        #self.write_managed_html(name=name, parent=None, type='handlebars')()
+                        raise HTTP(200, response.body.getvalue())
                         
                     if len(fields) == 1:
                         form.components = [form.custom.widget[fields[0].name]]
@@ -709,6 +716,7 @@ jQuery(function(){
                 elif action == 'show_add_content':
                     if not settings.editable:
                         raise HTTP(400)
+                    print request.vars['_target_el']
                     raise HTTP(200, self._add_content(name, request.vars['_target_el']))
                 else:
                     raise RuntimeError
@@ -1043,3 +1051,113 @@ jQuery(function(){
                 content['class'] = ' '.join(['handlebars_content_block',content.get('class', '')])
                 i = i + 1
         return str(contents).decode('utf-8', 'ignore')
+
+    def _convert(self, name, _html_converted, _html_rest):
+        if not _html_rest:
+            return XML('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+        for i in range(100):
+            match = response.page_url_regex.search(_html_rest)
+            if not match:
+                break
+            _html_converted += (_html_rest[:match.start()] + 'href="' + 
+                                response.page_url(match.group(1)) + 
+                                match.group(2))
+            _html_rest = _html_rest[match.end():]
+        return self.convert_handlebars(name, _html_converted + _html_rest)
+    
+    def load_handlebars(self, this, **kwdargs):
+        self.write_managed_html(**kwdargs)()
+    
+    def write_managed_html(self, **kwdargs):
+        name = kwdargs.get('name')
+        content_type = kwdargs.get('type')
+        if content_type == 'html':
+            @self.content_block(kwdargs.get('name'), Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), parent=None, content_type=content_type)
+            def _(content):
+                current.response.write(XML(_convert(name, '', content.html)).xml(), escape=False)
+            return _
+        elif content_type == 'handlebars':
+            @self.content_block(kwdargs.get('name'), 
+                    Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), 
+                    parent=None, content_type=content_type)
+            def _(content):
+                if name not in self.settings._handlebars_stack:
+                    self.settings._handlebars_stack.append(name)
+                    if content.handlebars:
+                        try:
+                            tree = content.handlebars_tree
+                            if tree:
+                                code = self.settings._handlebars_compiler._compiler(tree).apply('compile')[0]
+                                code({}, helpers={'load': self.load_handlebars})
+                            else:
+                                self.settings._handlebars_compiler.compile(_convert(name, '', content.handlebars)
+                                                             )({}, helpers={'load': self.load_handlebars})
+                        except HTTP as e:
+                            raise
+                        except Exception as e:
+                            if current.request.is_managed_html_mode:
+                                current.response.write(XML('<span style="color:red">handlebars error : %s</span>'%e.message).xml(), escape=False)
+                    else:
+                        current.response.write(XML('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').xml(), escape=False)
+                    pass
+                    self.settings._handlebars_stack.remove(name)
+                else:
+                    if current.request.is_managed_html_mode:
+                        current.response.write(XML('<span style="color:red">handlebars error : infinite loop "%s"</span>'%name).xml(), escape=False)
+            return _
+        elif content_type == 'google_map':
+            @self.content_block(name, 
+                                    Field('title', label='タイトル', default='芝公園'),
+                                    Field('lat', label='緯度', default='35.654071'), 
+                                    Field('long', label='経度', default='139.749838'),
+                                    Field('marker_lat', label='マーカー緯度', default='35.654071'),
+                                    Field('marker_long', label='マーカー経度', default='139.749838'),
+                                    Field('marker_image', label='マーカー画像'),
+                                    Field('template', 'text', label="テンプレート", default='<div id="map1" class="map" style="height:200px"></div>', widget=SQLFORM.widgets.text.widget), parent=kwdargs.get('parent'), content_type=content_type)
+            def _(content):
+                if not content:
+                    current.response.write('GoogleMap', escape=False)
+                current.response.write("""
+<script type="text/javascript">
+jQuery(function($) {
+  
+  var source   = $("#template_{{=name}}").html();
+  var template = Handlebars.compile(source);
+  var context  = {title: "{{=content.title}}"}
+  $('#content_{{=name}}').html(template(context));
+""")              
+                if content.template:
+                    current.response.write("""
+    var latlng = new google.maps.LatLng(%s,%s);
+    var opts = {
+      zoom: 15,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+
+    var map = new google.maps.Map($("#content_%s .map")[0], opts);
+    var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(%s,%s),
+          map: map,
+          title: '%s'
+    });
+    
+    var content = '<img src="%s" alt="%s"><br/>%s';
+    var infowindow = new google.maps.InfoWindow({
+      content: content ,
+      size: new google.maps.Size(50, 50)
+    });
+    
+    google.maps.event.addListener(marker, 'click', function() {
+      infowindow.open(map, marker);
+    });              
+"""%(content.lat, content.long, name, content.marker_lat, content.marker_long, content.title, content.marker_image, content.title, content.title))
+                current.response.write("""
+});
+</script>
+<script id="template_%s" type="text/x-handlebars-template">
+  {{=XML(content.template or '<table width="400px"></table>')}}
+</script>
+<div id="content_%s"></div>
+"""%s(name, name))              
+            return _
