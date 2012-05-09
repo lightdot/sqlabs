@@ -276,6 +276,8 @@ class ManagedHTML(object):
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
             URL('static', 'plugin_smarteditor_widget/underscore.js'),
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
+            URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
+            URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
