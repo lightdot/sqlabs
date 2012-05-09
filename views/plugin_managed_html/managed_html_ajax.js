@@ -46,18 +46,20 @@ jQuery.extend(jQuery.easing,
   ));
   {{ if current_device and 'view_width' in current_device and (is_edit_mode or is_preview_mode):}}
     $('body, #main').css({'width':'{{=current_device['view_width']}}px', 'min-width':'{{=current_device['view_width']}}px', 'margin':'0px 20px 0px 20px'});
+    
     $('#base').css({'position':'absolute'});
     {{ if is_edit_mode:}}
       var reference_view = $('<div id="managed_reference_view"></div>'
                               ).css('left', '{{=int(current_device['view_width']) + 40}}px');
       var reference_view_content = $('<div id="managed_reference_view_content">');
       reference_view.append(reference_view_content);
-      $('body').prepend(reference_view);
-      managed_html_web2py_ajax_page('post', '{{=reference_url}}', 
-                                    {'_action':'reference'}, 
-                                    'managed_reference_view_content',
-                                    null,
-                                    true);
+      // TODO リファレンスモードの削除
+      //$('body').prepend(reference_view);
+      //managed_html_web2py_ajax_page('post', '{{=reference_url}}', 
+      //                              {'_action':'reference'}, 
+      //                              'managed_reference_view_content',
+      //                              null,
+      //                              true);
     {{pass}}
   {{pass}}
   var secondary_nav = $('<ul class="managed_html_secondary_nav"></ul>');
