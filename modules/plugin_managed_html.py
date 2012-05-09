@@ -217,9 +217,10 @@ class ManagedHTML(object):
                 
                 _device_url_base = self.view_mode
                 for device in self.settings.devices:
-                    _device_url_base = _device_url_base.replace('_managed_html_%s'%device['name'], '')
+                    _device_url_base = _device_url_base.replace('_managed_html_%s' % device['name'], '')
                 for device in self.settings.devices:
-                    device.update({'url':self.settings.URL(args=[_device_url_base+'_managed_html_%s'%device['name']]+request.args[1:-1], vars=request.vars)})
+                    device.update({'url':self.settings.URL(args=[_device_url_base + '_managed_html_%s' % device['name']] + request.args[1:-1], vars=request.vars)})
+                
                 _response.headers['Content-Type'] = 'text/javascript; charset=utf-8;'
                 raise HTTP(200, _response.render('plugin_managed_html/managed_html_ajax.js',
                             dict(
@@ -231,7 +232,7 @@ class ManagedHTML(object):
                                 preview_url=settings.URL(args=[self.view_mode.replace(EDIT_MODE, PREVIEW_MODE).replace(REFERENCE_MODE, PREVIEW_MODE)] +
                                                                  request.args[1:-1], vars=request.vars)
                                             if EDIT_MODE in self.view_mode or REFERENCE_MODE in self.view_mode else '',
-                                reference_url=settings.URL(args=[self.view_mode.replace(EDIT_MODE, REFERENCE_MODE).replace(PREVIEW_MODE, REFERENCE_MODE).replace('_managed_html_%s'%current_device['name'] if current_device else '', '')] +
+                                reference_url=settings.URL(args=[self.view_mode.replace(EDIT_MODE, REFERENCE_MODE).replace(PREVIEW_MODE, REFERENCE_MODE).replace('_managed_html_%s' % current_device['name'] if current_device else '', '')] +
                                                                  request.args[1:-1], vars=request.vars)
                                             if EDIT_MODE in self.view_mode or PREVIEW_MODE in self.view_mode else '',
                                 live_url=self.settings.URL(args=request.args[1:-1], vars=request.vars, scheme='http'),
@@ -661,6 +662,13 @@ jQuery(function(){
                         for field in fields:
                             field_value = form.vars[field.name]
                             data[field.name] = field_value
+                            if field.name == 'handlebars':
+                                if field_value:
+                                    from pybars import Compiler
+                                    tree = Compiler._get_handlebars_template()(field_value.decode('utf-8', 'ignore')).apply('template')[0]
+                                else:
+                                    tree = None
+                                data['handlebars_tree'] = tree
 
                         table_content = settings.table_content
                         self.db(table_content.name == name)(table_content.publish_on == None).delete()

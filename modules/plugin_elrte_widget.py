@@ -89,4 +89,4 @@ jQuery(function() { var t = 10; (function run() {if ((function() {
            cssfiles=json.dumps(self.settings.cssfiles),
            ))
         
-        return SPAN(script, TEXTAREA((value != None and str(value)) or '', **attr), **attributes)
+        return SPAN(script, TEXTAREA(value or '', **attr), **attributes)
