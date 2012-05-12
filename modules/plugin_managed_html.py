@@ -659,9 +659,7 @@ jQuery(function(){
                         table_content.insert(name=name, data=json.dumps(data))
                         
                         response.flash = T('Edited')
-                        response.js = 'managed_html_published("%s", false);' % el_id
-                        response.js += 'managed_html_editing("%s", false);' % el_id
-                        response.js += 'managed_html_editing("%s", false);' % el_id
+                        response.js = 'window.location.reload();'
                         
                         raise HTTP(200, '')
                         
@@ -672,7 +670,7 @@ jQuery(function(){
                                INPUT(_type='hidden', _name='_action', _value='edit')]
                     content = self._get_content(name)
                     
-                    raise HTTP(200, DIV(form, _style='display:none;'))
+                    raise HTTP(200, DIV(form))
                     
                 elif action in ('back', 'publish_now'):
                     content = self._get_content(name)
@@ -693,6 +691,10 @@ jQuery(function(){
                 elif action in ('unique_key'):
                     from gluon.utils import web2py_uuid
                     raise HTTP(200, web2py_uuid())
+                elif action == 'show_add_content':
+                    if not settings.editable:
+                        raise HTTP(400)
+                    raise HTTP(200, self._add_content(name, request.vars['_target_el']))
                 else:
                     raise RuntimeError
                 
@@ -702,8 +704,8 @@ jQuery(function(){
                 if EDIT_MODE in self.view_mode:
                     is_published = self._is_published(content)
                     
-                    response.write(XML('<div id="%s" class="managed_html_content_block %s">' %
-                                        (el_id, 'managed_html_content_block_pending' if not is_published else '')))
+                    response.write(XML('<div id="%s" class="managed_html_content_block %s" content_type="%s">' %
+                                        (el_id, 'managed_html_content_block_pending' if not is_published else '', kwargs.get('content_type', ''))))
                     
                     # === write content ===
                     response.write(XML('<div id="%s" class="managed_html_content">' % content_el_id))
@@ -783,9 +785,37 @@ jQuery(function(){
             current.response.flash = ''
             return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' +
                               self._post_collection_js(name, 'add', content_type=form.vars.content_type)))
-            
         return form
         
+    def _add_content(self, name, target_el):
+        T = current.T
+        form = SQLFORM.factory(
+            Field('content_type',
+                  requires=IS_IN_SET(self.settings.content_types.keys(), zero=None)),
+            submit_button=T('Submit'),
+        )
+        
+        if form.validate():
+            current.response.flash = ''
+            from gluon.utils import web2py_uuid
+            uuld = web2py_uuid()
+            return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' + 
+                              """
+    var baseEl,
+    baseEl = $('[handlebars_id=%s]');
+    if (baseEl.attr('handlebars_id') === void 0) {
+      baseEl = baseEl.closest(".handlebars_content_block");
+    }
+    var $data, form, load;
+    load = '<div>{{load type="%s" name="%s"}}</div>';
+    form = "#managed_html_content_form_%s";
+    $data = $($('<div>').append($(form + " form textarea").text()));
+    $data.find('[handlebars_id=' + baseEl.attr('handlebars_id') + ']').after(load);
+    $(form + " form textarea").text($data.html());
+    baseEl.after($('<div handlebars_id="%s" contenteditable="false"><div class="managed_html_content_anchor" onclick="">&nbsp;</div><div onclick="" class="managed_html_content_inner"><div class="managed_html_empty_content">&nbsp;</div></div></div>'));
+"""%(target_el, form.vars.content_type, uuld, name, uuld)))
+        return form
+
     def collection_block(self, name, **kwargs):
         request, response, session, T, settings = (
             current.request, current.response, current.session, current.T, self.settings)
