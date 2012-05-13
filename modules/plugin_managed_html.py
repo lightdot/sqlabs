@@ -22,6 +22,21 @@ IMAGE_EXTENSIONS = ('png', 'jpg', 'jpeg', 'gif', 'bmp')
 MOVIE_EXTENSIONS = ('flv', 'mp4', 'm4v', 'avi', 'wmv')
 FILE_EXTENSIONS = None
 
+def convert_handlebars(html):
+    if not html:
+        return ''
+    from BeautifulSoup import BeautifulSoup, Tag
+    contents = BeautifulSoup(html, fromEncoding="utf-8")
+    i = 0
+    for content in contents.findAll():
+        if isinstance(content, Tag):
+            content['hid'] = i
+            cls = content.get('class', '')
+            if 'handlebars_content_block' not in cls:
+                cls = ' '.join(['handlebars_content_block',cls])
+            content['class'] = cls
+            i = i + 1
+    return str(contents).decode('utf-8', 'ignore')
 
 class IS_HTML(Validator):
     def _strip(self, value):
@@ -604,8 +619,6 @@ jQuery(function(){
                 func(Storage(content and content.data and json.loads(content.data) or {}))
                 
                 if EDIT_MODE in self.view_mode:
-                    if len(response.body.getvalue()) == _body_len:
-                        response.write(XML("<div class='managed_html_empty_content' >&nbsp;</div>"))
                     response.write(XML('</div>'))
             
             if (EDIT_MODE in self.view_mode and request.ajax and
@@ -647,9 +660,9 @@ jQuery(function(){
                                     request.vars[field.name] = map(int, request.vars[field.name])
                             
                         if field.name == 'handlebars':
-                            virtual_record[field.name] = self.convert_handlebars(name, virtual_record[field.name])
+                            virtual_record[field.name] = convert_handlebars(virtual_record[field.name])
 
-                        if request.vars['dummy_form']:
+                        if (field.name == 'handlebars' or field.name == 'html') and request.vars['dummy_form']:
                             field.widget = self.text_widget
                             field.requires = IS_HTML()
                             
@@ -669,7 +682,9 @@ jQuery(function(){
                             if field.name == 'handlebars':
                                 if field_value:
                                     from pybars import Compiler
-                                    tree = Compiler._get_handlebars_template()(field_value.decode('utf-8', 'ignore')).apply('template')[0]
+                                    field_value = convert_handlebars(field_value.decode('utf-8', 'ignore'))
+                                    tree = Compiler._get_handlebars_template()(field_value).apply('template')[0]
+                                    data[field.name] = field_value
                                 else:
                                     tree = None
                                 data['handlebars_tree'] = tree
@@ -717,7 +732,6 @@ jQuery(function(){
                 elif action == 'show_add_content':
                     if not settings.editable:
                         raise HTTP(400)
-                    print request.vars['_target_el']
                     raise HTTP(200, self._add_content(name, request.vars['_target_el']))
                 else:
                     raise RuntimeError
@@ -736,43 +750,6 @@ jQuery(function(){
                     _func(content)
                     response.write(XML('</div>'))  # <div style="clear:both;"></div>
                     
-                    # === write action buttons ===
-                    response.write(XML(DIV(DIV(
-                        SPAN(INPUT(_value=T('Back'), _type='button',
-                              _onclick=self._post_content_js(name, 'back'),
-                              _class='managed_html_btn'),
-                          _class='managed_html_back_btn',
-                          _style='display:none;') if settings.editable else '',
-                        SPAN(INPUT(_value=T('Submit'), _type='button',
-                              _onclick='jQuery("#%s"+" form").submit()' % content_el_id,
-                              _class='managed_html_btn managed_html_primary_btn'),
-                          _class='managed_html_submit_btn',
-                          _style='display:none;') if settings.editable else '',
-                        SPAN(INPUT(_value=T('Edit'), _type='button',
-                              _onclick=self._post_content_js(name, 'edit'),
-                              _class='managed_html_btn'),
-                           _class='managed_html_edit_btn') if settings.editable else '',
-                        SPAN(INPUT(_value=T('Publish'), _type='button',
-                              _onclick=self._post_content_js(name, 'publish_now'),
-                              _class='managed_html_btn managed_html_success_btn'),
-                           _class='managed_html_publish_now_btn',
-                           _style='display:none;' if is_published else '') if settings.publishable else '',
-                        SPAN(INPUT(_value=T('History'), _type='button',
-                              _onclick=self._show_history_grid_js(name),
-                              _class='managed_html_btn managed_html_info_btn'),
-                           _class='managed_html_history_btn',
-                           _style='display:none;')  if settings.editable else '',
-                       SPAN(SPAN(T('Move'),
-                              _title=T('Drag me'),
-                              _class='managed_html_btn managed_html_warning_btn'),
-                           _class='managed_html_move_btn')  if kwargs.get('parent') else '',
-                       SPAN(INPUT(_value=T('Delete'), _type='button',
-                              _onclick='if(confirm("%s")){%s;}' % (
-                                            T('Are you sure you want to delete this object?'),
-                                            self._post_collection_js(kwargs['parent'], 'delete', content=name)),  # 'alert("%s")' % kwargs['parent'],
-                              _class='managed_html_btn managed_html_danger_btn'),
-                           _class='managed_html_delete_btn')  if kwargs.get('parent') else '',
-                    ), _class='managed_html_content_ctrl')))
                     
                     response.write(XML('</div>'))
                     
@@ -818,244 +795,17 @@ jQuery(function(){
                   requires=IS_IN_SET(self.settings.content_types.keys(), zero=None)),
             submit_button=T('Submit'),
         )
-        
-        if form.validate():
-            current.response.flash = ''
-            from gluon.utils import web2py_uuid
-            uuld = web2py_uuid()
-            return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' + 
-                              """
-    var baseEl,
-    baseEl = $('[handlebars_id=%s]');
-    if (baseEl.attr('handlebars_id') === void 0) {
-      baseEl = baseEl.closest(".handlebars_content_block");
-    }
-    var $data, form, load;
-    load = '<div>{{load type="%s" name="%s"}}</div>';
-    form = "#managed_html_content_form_%s";
-    $data = $($('<div>').append($(form + " form textarea").text()));
-    $data.find('[handlebars_id=' + baseEl.attr('handlebars_id') + ']').after(load);
-    $(form + " form textarea").text($data.html());
-    baseEl.after($('<div handlebars_id="%s" contenteditable="false" class="new_content_block" content_type="%s"><div class="managed_html_content_anchor" onclick="">&nbsp;</div><div onclick="" class="managed_html_content_inner"><div class="managed_html_empty_content">&nbsp;</div></div></div>'));
-"""%(target_el, form.vars.content_type, uuld, name, uuld, form.vars.content_type)))
+        from gluon.utils import web2py_uuid
+        form.components += [INPUT(_type='hidden', _name=self.keyword, _value=name),
+                   INPUT(_type='hidden', _name='_action', _value='show_add_content'),
+                   INPUT(_type='hidden', _name='_target_el', _value=target_el),
+                   INPUT(_type='hidden', _name='_name', _value=web2py_uuid()),
+                   ]
         return form
-
-    def collection_block(self, name, **kwargs):
-        request, response, session, T, settings = (
-            current.request, current.response, current.session, current.T, self.settings)
-        el_id = 'managed_html_collection_block_%s' % name
-        collection_el_id = 'managed_html_collection_%s' % name
-        
-        def _decorator(func):
-            
-            def _func(collection):
-                if EDIT_MODE in self.view_mode:
-                    response.write(XML("<div class='managed_html_collection_inner'><div>"))
-                
-                _collection = []
-                from functools import partial
-                for content_type, content_name in collection and collection.data and json.loads(collection.data) or []:
-                    _content_func = settings.content_types.get(content_type, lambda name, parent=None: '')
-                    _collection.append(partial(_content_func, content_name, parent=name))
-                func(_collection)
-                
-                if EDIT_MODE in self.view_mode:
-                    response.write(XML('<div class="%s">&nbsp;</div>' %
-                                        ('managed_html_collection_anchor' if collection and collection.publish_on
-                                            else 'managed_html_collection_anchor_pending')))
-#                    response.write(XML("""
-#<script>jQuery(function(){managed_html_move("%s", "%s", "%s", "%s")})</script>""" %
-#                            (name, self.keyword, URL(args=request.args),  # , vars=request.get_vars
-#                             current.T('Sure you want to move them?'))))
-                    response.write(XML('</div></div>'))
-            
-            if (EDIT_MODE in self.view_mode and request.ajax and
-                    self.keyword in request.vars and request.vars[self.keyword] == name):
-                
-                import cStringIO
-                table_content = settings.table_content
-                action = request.vars.get('_action')
-                response.js = 'managed_html_init_blocks();'
-                
-                if action in ('add', 'revert'):
-                    if not settings.editable:
-                        raise HTTP(400)
-                        
-                    collection = self._get_content(name, id=request.vars.content_id if action == 'revert' else None)
-                    if not collection:
-                        collection = self._get_content(name)
-                    data = collection and collection.data and json.loads(collection.data) or []
-                    
-                    if action == 'add':
-                        from gluon.utils import web2py_uuid
-                        new_content_name = web2py_uuid()
-                        data.append([request.vars.content_type, new_content_name])
-                        response.flash = T('Added')
-                        
-                    elif action == 'revert':
-                        response.flash = T('Reverted')
-                      
-                    response.js += 'managed_html_collection_published("%s", false);' % el_id
-                        
-                    self.db(table_content.name == name)(table_content.publish_on == None).delete()
-                    table_content.insert(name=name, data=json.dumps(data))
-                    collection = self._get_content(name)
-                        
-                    response.body = cStringIO.StringIO()
-                    _func(collection)
-                    raise HTTP(200, response.body.getvalue())
-                    
-                elif action in ('publish_now', 'delete', 'move'):
-                    collection = self._get_content(name)
-                    
-                    if action == 'publish_now':
-                        collection.update_record(publish_on=request.now)
-                        response.js += 'managed_html_collection_published("%s", true);' % el_id
-                        response.flash = T('Published')
-                    
-                    elif action in ('delete', 'move'):
-                        _data = json.loads(collection.data)
-                        
-                        if action == 'delete':
-                            _data = [c for c in _data if c[1] != request.vars.content]
-                            response.flash = T('Deleted')
-                        
-                        elif action == 'move':
-                            from_name = request.vars.get('from')
-                            to_name = request.vars.get('to')
-                            from_idx = to_idx = -1
-                            for i, c in enumerate(_data):
-                                if c[1] == from_name:
-                                    from_idx = i
-                                elif c[1] == to_name:
-                                    to_idx = i
-
-                            if from_idx >= 0 and to_idx >= 0:
-                                _tmp = _data[from_idx]
-                                _data[from_idx] = _data[to_idx]
-                                _data[to_idx] = _tmp
-                                response.flash = T('Moved')
-
-                        self.db(table_content.name == name)(table_content.publish_on == None).delete()
-                        table_content.insert(name=name, data=json.dumps(_data))
-                        collection = self._get_content(name)
-                        
-                        response.js += 'managed_html_collection_published("%s", false);' % el_id
-                        
-                    response.body = cStringIO.StringIO()
-                    _func(collection)
-                    raise HTTP(200, response.body.getvalue())
-                    
-                elif action == 'show_add_form':
-                    if not settings.editable:
-                        raise HTTP(400)
-                    raise HTTP(200, self._add_form(name))
-                    
-                elif action == 'reference':
-                    if not settings.editable:
-                        raise HTTP(400)
-                    
-                    collection = self._get_content(name, id=request.vars.content_id if action == 'revert' else None)
-                    if not collection:
-                        collection = self._get_content(name)
-                    data = collection and collection.data and json.loads(collection.data) or []
-
-                    from gluon.utils import web2py_uuid
-                    new_content_name = web2py_uuid()
-                    reference = self._get_content(request.vars.reference_id)
-                    updator = self.settings.table_content._filter_fields(reference)
-                    updator['name'] = new_content_name
-                    updator['publish_on'] = None
-                    self.settings.table_content.insert(**updator)
-                    data.append(['html', new_content_name])
-                    response.flash = T('Added')
-                      
-                    response.js += 'managed_html_collection_published("%s", false);' % el_id
-                        
-                    self.db(table_content.name == name)(table_content.publish_on == None).delete()
-                    table_content.insert(name=name, data=json.dumps(data))
-                    collection = self._get_content(name)
-                        
-                    response.body = cStringIO.StringIO()
-                    _func(collection)
-                    raise HTTP(200, response.body.getvalue())
-                    
-#                    collection = self._get_content(name, id=request.vars.content_id if action == 'revert' else None)
-#                    if not collection:
-#                        collection = self._get_content(name)
-#                    data = collection and collection.data and json.loads(collection.data) or []
-#                    
-#                    if action == 'add':
-#                        from gluon.utils import web2py_uuid
-#                        new_content_name = web2py_uuid()
-#                        data.append([request.vars.content_type, new_content_name])
-#                        response.flash = T('Added')
-                else:
-                    raise RuntimeError
-                    
-            def wrapper(*args, **kwds):
-                #self.db(self.settings.table_content.name==name).delete()
-                
-                collection = self._get_content(name, cache=kwargs.get('cache'))
-                
-                if EDIT_MODE in self.view_mode:
-                    is_published = self._is_published(collection)
-                    
-                    response.write(XML('<div id="%s" class="managed_html_collection_block %s">' %
-                                        (el_id, 'managed_html_collection_block_pending' if not is_published else '')))
-                    
-                    response.write(XML('<div id="%s" class="managed_html_collection">' % collection_el_id))
-                    
-                    _func(collection)
-                    
-                    response.write(XML('</div>'))
-                    
-                    # TODO refactoring
-                    response.write(XML(DIV(DIV(
-                                SPAN(INPUT(_value=T('Add'), _type='button',
-                                      _onclick=self._show_add_form_js(name),
-                                      _class='managed_html_btn'),
-                                   _class='managed_html_edit_btn') if settings.editable else '',
-                                SPAN(INPUT(_value=T('Reference'), _type='button',
-                                      _onclick="reference_start('%s', '%s');"%(name, URL(args=request.args)),
-                                      _class='managed_html_btn'),
-                                   _class='managed_html_reference_btn') if request.is_mobile else '',
-                                SPAN(INPUT(_value=T('Publish'), _type='button',
-                                      _onclick=self._post_collection_js(name, 'publish_now'),
-                                      _class='managed_html_btn managed_html_success_btn'),
-                                   _class='managed_html_publish_now_btn',
-                                   _style='display:none;' if is_published else '') if settings.publishable else '',
-                                SPAN(INPUT(_value=T('History'), _type='button',
-                                      _onclick=self._show_history_grid_js(name, collection=True),
-                                      _class='managed_html_btn managed_html_info_btn'),
-                                   _class='managed_html_history_btn')  if settings.editable else '',
-                            ), _class='managed_html_collection_ctrl')))
-                    
-                    response.write(XML('</div>'))
-                else:
-                    response.write(XML('<div id="%s">' % el_id))
-                    _func(collection)
-                    response.write(XML('</div>'))
-            return wrapper
-        return _decorator
     
-    def convert_handlebars(self, name, html):
-        if not html:
-            return ''
-        from BeautifulSoup import BeautifulSoup, Tag
-        contents = BeautifulSoup(html, fromEncoding="utf-8")
-        
-        i = 0
-        for content in contents.findAll():
-            if isinstance(content, Tag):
-                content['handlebars_id'] = '%s_%s'%(name, i)
-                content['class'] = ' '.join(['handlebars_content_block',content.get('class', '')])
-                i = i + 1
-        return str(contents).decode('utf-8', 'ignore')
-
     def _convert(self, name, _html_converted, _html_rest):
         if not _html_rest:
-            return XML('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            return XML('<div class="managed_html_empty_content">&nbsp;</div>').xml()
         for i in range(100):
             match = response.page_url_regex.search(_html_rest)
             if not match:
@@ -1064,7 +814,7 @@ jQuery(function(){
                                 response.page_url(match.group(1)) + 
                                 match.group(2))
             _html_rest = _html_rest[match.end():]
-        return self.convert_handlebars(name, _html_converted + _html_rest)
+        return convert_handlebars(name, _html_converted + _html_rest)
     
     def load_handlebars(self, this, **kwdargs):
         self.write_managed_html(**kwdargs)()
@@ -1075,7 +825,7 @@ jQuery(function(){
         if content_type == 'html':
             @self.content_block(kwdargs.get('name'), Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), parent=None, content_type=content_type)
             def _(content):
-                current.response.write(XML(_convert(name, '', content.html)).xml(), escape=False)
+                current.response.write(XML(content.html).xml(), escape=False)
             return _
         elif content_type == 'handlebars':
             @self.content_block(kwdargs.get('name'), 
@@ -1088,18 +838,19 @@ jQuery(function(){
                         try:
                             tree = content.handlebars_tree
                             if tree:
+                                from pprint import pprint
+                                #pprint(tree)
                                 code = self.settings._handlebars_compiler._compiler(tree).apply('compile')[0]
                                 code({}, helpers={'load': self.load_handlebars})
                             else:
-                                self.settings._handlebars_compiler.compile(_convert(name, '', content.handlebars)
-                                                             )({}, helpers={'load': self.load_handlebars})
+                                self.settings._handlebars_compiler.compile(name, '', content.handlebars)({}, helpers={'load': self.load_handlebars})
                         except HTTP as e:
                             raise
                         except Exception as e:
                             if current.request.is_managed_html_mode:
                                 current.response.write(XML('<span style="color:red">handlebars error : %s</span>'%e.message).xml(), escape=False)
                     else:
-                        current.response.write(XML('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').xml(), escape=False)
+                        current.response.write(XML('<div class="managed_html_empty_content">&nbsp;</div>').xml(), escape=False)
                     pass
                     self.settings._handlebars_stack.remove(name)
                 else:
@@ -1117,18 +868,19 @@ jQuery(function(){
                                     Field('template', 'text', label="テンプレート", default='<div id="map1" class="map" style="height:200px"></div>', widget=SQLFORM.widgets.text.widget), parent=kwdargs.get('parent'), content_type=content_type)
             def _(content):
                 if not content:
-                    current.response.write('GoogleMap', escape=False)
-                current.response.write("""
+                    current.response.write(XML('GoogleMap'), escape=False)
+                current.response.write(XML("""
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
 jQuery(function($) {
   
-  var source   = $("#template_{{=name}}").html();
+  var source   = $("#template_%s").html();
   var template = Handlebars.compile(source);
-  var context  = {title: "{{=content.title}}"}
-  $('#content_{{=name}}').html(template(context));
-""")              
+  var context  = {title: "%s"}
+  $('#content_%s').html(template(context));
+"""%(name, content.title, name)))
                 if content.template:
-                    current.response.write("""
+                    current.response.write(XML("""
     var latlng = new google.maps.LatLng(%s,%s);
     var opts = {
       zoom: 15,
@@ -1152,13 +904,13 @@ jQuery(function($) {
     google.maps.event.addListener(marker, 'click', function() {
       infowindow.open(map, marker);
     });              
-"""%(content.lat, content.long, name, content.marker_lat, content.marker_long, content.title, content.marker_image, content.title, content.title))
-                current.response.write("""
+"""%(content.lat, content.long, name, content.marker_lat, content.marker_long, content.title, content.marker_image, content.title, content.title)))
+                current.response.write(XML("""
 });
 </script>
 <script id="template_%s" type="text/x-handlebars-template">
-  {{=XML(content.template or '<table width="400px"></table>')}}
+  %s
 </script>
 <div id="content_%s"></div>
-"""%s(name, name))              
+"""%(name, content.template or '<table width="400px"></table>', name)))              
             return _
