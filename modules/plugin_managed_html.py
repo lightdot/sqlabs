@@ -315,25 +315,6 @@ class ManagedHTML(object):
                         content=self.settings.page_grid,
                         _class='managed_html_dialog').show(reload=True)
     
-    def _show_history_grid_js(self, content_name, collection=False):
-        from plugin_dialog import DIALOG
-        T = current.T
-        request = current.request
-        
-        _post_js = self._post_content_js if not collection else self._post_collection_js
-        
-        return """
-jQuery(document.body).one('managed_html_history_selected', function(e, content_id) {
-    eval('%(post)s'.replace("__placeholder__", content_id));
-    jQuery('.managed_html_dialog').hide();
-}); %(show)s; return false;""" % dict(
-            post=_post_js(content_name, 'revert', content_id='__placeholder__'),
-            show=DIALOG(title=T('History'), close_button=T('close'),
-                      content=LOAD(url=URL(args=(request.args or []) + ['history'],
-                                           vars={self.history_grid_keyword: content_name}), ajax=True),
-                      _class='managed_html_dialog'
-                      ).show(reload=True))
-                    
     def _history_grid(self, args):
         T = current.T
         request = current.request
@@ -349,9 +330,9 @@ jQuery(document.body).one('managed_html_history_selected', function(e, content_i
             data = json.loads(v)
             if type(data) == dict:
                 return DIV([DIV(DIV(k), TEXTAREA(v, _rows=3, _cols=50, _style='width:90%;'))
-                            for k, v in data.items()])
+                            for k, v in data.items() if k != 'handlebars_tree'])
             elif type(data) == list:
-                return DIV([DIV(k, ':', v) for k, v in data])
+                return DIV([DIV(k, ':', v) for k, v in data if k != 'handlebars_tree'])
             
         table_content.data.represent = _represent
                 
@@ -359,9 +340,7 @@ jQuery(document.body).one('managed_html_history_selected', function(e, content_i
             {'label': '', 'width': '150px;',
                 'content':lambda row, rc:
                  SPAN(self.solidgrid.settings.recordbutton('ui-icon-circle-arrow-w', T('Revert'),
-                            '#', _onclick="""
-jQuery(document.body).trigger('managed_html_history_selected', ['%s']);return false;
-                            """ % (row.id), _class='ui-btn'))},
+                            '#', _class='ui-btn'))},
         ]
         
         content_name = request.vars.get(self.history_grid_keyword, request.args(2))
