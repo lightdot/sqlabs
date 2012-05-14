@@ -16,9 +16,12 @@ jQuery.extend(jQuery.easing,
   var live_url = "{{=live_url}}";
   
   var height = 40;
-  var padding = parseInt($('body').css('padding-top'));
-  $('body').css('padding-top', (padding+height) + 'px');
-  var topbar = $('<div class="managed_html_topbar" data-dropdown="dropdown" style="height:'+height+'px;"></div>');
+  var topbar = $('<div class="managed_html_topbar" data-dropdown="dropdown" style="height:'+height+'px;top:0px;"></div>');
+  var menuYloc = parseInt(topbar.css("top").substring(0,topbar.css("top").indexOf("px")))
+  $(window).scroll(function () {
+    var offset = menuYloc+$(document).scrollTop()+"px";
+    topbar.animate({top:offset},{duration:500,queue:false});
+  });
   var inner = $('<div class="managed_html_container_fluid"></div>');
   var brand = $('<a class="managed_html_brand" href="{{=home_url}}">{{=home_label}}</a>');
   var nav = $('<ul></ul>');
