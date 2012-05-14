@@ -803,21 +803,11 @@ jQuery(function(){
                    ]
         return form
     
-    def _convert(self, name, _html_converted, _html_rest):
-        if not _html_rest:
-            return XML('<div class="managed_html_empty_content">&nbsp;</div>').xml()
-        for i in range(100):
-            match = response.page_url_regex.search(_html_rest)
-            if not match:
-                break
-            _html_converted += (_html_rest[:match.start()] + 'href="' + 
-                                response.page_url(match.group(1)) + 
-                                match.group(2))
-            _html_rest = _html_rest[match.end():]
-        return convert_handlebars(name, _html_converted + _html_rest)
-    
     def load_handlebars(self, this, **kwdargs):
         self.write_managed_html(**kwdargs)()
+    
+    def url_helper(self, this, **kwdargs):
+        current.response.write(XML(current.response.page_url(kwdargs.get('page')) + kwdargs.get('anchor')).xml(), escape=False)
     
     def write_managed_html(self, **kwdargs):
         name = kwdargs.get('name')
@@ -841,9 +831,9 @@ jQuery(function(){
                                 from pprint import pprint
                                 #pprint(tree)
                                 code = self.settings._handlebars_compiler._compiler(tree).apply('compile')[0]
-                                code({}, helpers={'load': self.load_handlebars})
+                                code({}, helpers={'load': self.load_handlebars, 'url':self.url_helper})
                             else:
-                                self.settings._handlebars_compiler.compile(name, '', content.handlebars)({}, helpers={'load': self.load_handlebars})
+                                self.settings._handlebars_compiler.compile(name, '', content.handlebars)({}, helpers={'load': self.load_handlebars, 'url':self.url_helper})
                         except HTTP as e:
                             raise
                         except Exception as e:
