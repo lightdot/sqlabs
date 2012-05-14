@@ -64,7 +64,6 @@ class IS_HTML(Validator):
 
         return (self._strip(str(_soup(value))), None)
 
-
 class ManagedHTML(object):
 
     def __init__(self, db, keyword='_managed_html'):
@@ -739,33 +738,6 @@ jQuery(function(){
                     response.write(XML('</div>'))
             return wrapper
         return _decorator
-        
-    def _show_add_form_js(self, name):
-        from plugin_dialog import DIALOG
-        T = current.T
-        request = current.request
-        return DIALOG(title=T('Select'), close_button=T('close'),
-                        content=LOAD(url=URL(args=request.args,
-                                     vars={self.keyword: name, '_action': 'show_add_form'}),
-                                     ajax=True),
-                        _class='managed_html_dialog').show(reload=True)
-    
-    def _post_collection_js(self, name, action, **attrs):
-        return self._post_js('managed_html_collection_%s' % name, name, action, **attrs)
-                       
-    def _add_form(self, name):
-        T = current.T
-        form = SQLFORM.factory(
-            Field('content_type',
-                  requires=IS_IN_SET(self.settings.content_types.keys(), zero=None)),
-            submit_button=T('Submit'),
-        )
-        
-        if form.validate():
-            current.response.flash = ''
-            return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' +
-                              self._post_collection_js(name, 'add', content_type=form.vars.content_type)))
-        return form
         
     def _add_content(self, name, target_el):
         T = current.T
