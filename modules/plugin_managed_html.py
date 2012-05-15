@@ -812,8 +812,8 @@ jQuery(function(){
     $data = $($('<div>').append($(form + " form textarea").text()));
     $data.find('[handlebars_id=' + baseEl.attr('handlebars_id') + ']').after(load);
     $(form + " form textarea").text($data.html());
-    baseEl.after($('<div handlebars_id="%s" contenteditable="false"><div class="managed_html_content_anchor" onclick="">&nbsp;</div><div onclick="" class="managed_html_content_inner"><div class="managed_html_empty_content">&nbsp;</div></div></div>'));
-"""%(target_el, form.vars.content_type, uuld, name, uuld)))
+    baseEl.after($('<div handlebars_id="%s" contenteditable="false" class="new_content_block" content_type="%s"><div class="managed_html_content_anchor" onclick="">&nbsp;</div><div onclick="" class="managed_html_content_inner"><div class="managed_html_empty_content">&nbsp;</div></div></div>'));
+"""%(target_el, form.vars.content_type, uuld, name, uuld, form.vars.content_type)))
         return form
 
     def collection_block(self, name, **kwargs):
@@ -1018,8 +1018,9 @@ jQuery(function(){
     def convert_handlebars(self, name, html):
         from BeautifulSoup import BeautifulSoup, Tag
         contents = BeautifulSoup(html, fromEncoding="utf-8")
+        
         i = 0
-        for content in contents:
+        for content in contents.findAll(["div"]):
             if isinstance(content, Tag):
                 content['handlebars_id'] = '%s_%s'%(name, i)
                 content['class'] = 'handlebars_content_block'
