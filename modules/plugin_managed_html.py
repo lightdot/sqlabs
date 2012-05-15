@@ -423,8 +423,8 @@ class ManagedHTML(object):
                 'content':lambda row, rc:
                     SPAN(self.solidgrid.settings.recordbutton('ui-icon-seek-next', T('Select'),
                             '#', _onclick="""
-jQuery(document.body).trigger('managed_html_file_selected', ['%s', '%s']);return false;
-                            """ % (row.name, row.thumbnail), _class='ui-btn'))},
+jQuery('img[src=dummy-image]').attr('src', jQuery(this).closest('tr').find('textarea').val());jQuery('#managed_html_image_chooser').remove();
+                            """ , _class='ui-btn'))},
              {'label': T('File'), 'width': '150px;',
               'content':lambda row, rc: DIV(
                 DIV(self._file_represent(row.name, row.thumbnail)),
