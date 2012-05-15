@@ -4,7 +4,7 @@ jQuery.extend(jQuery.easing,
     return c*(t/=d)*t*t*t + b;
   },
 });
-	
+
 (function($) {$(function(){
   
   managed_html_init_blocks();
@@ -19,8 +19,13 @@ jQuery.extend(jQuery.easing,
   var topbar = $('<div class="managed_html_topbar" data-dropdown="dropdown" style="height:'+height+'px;top:0px;"></div>');
   var menuYloc = parseInt(topbar.css("top").substring(0,topbar.css("top").indexOf("px")))
   $(window).scroll(function () {
-    var offset = menuYloc+$(document).scrollTop()+"px";
-    topbar.animate({top:offset},{duration:500,queue:false});
+    if($('.move_topbar:visible').text() == 'Down'){
+      var offset = menuYloc+$(document).scrollTop()+"px";
+      topbar.animate({top:offset},{duration:500,queue:false});
+    }else{
+      var offset = window.innerHeight-40+menuYloc+$(document).scrollTop()+"px";
+      topbar.animate({top:offset},{duration:500,queue:false});
+    }
   });
   var inner = $('<div class="managed_html_container_fluid"></div>');
   var brand = $('<a class="managed_html_brand" href="{{=home_url}}">{{=home_label}}</a>');
@@ -67,6 +72,19 @@ jQuery.extend(jQuery.easing,
   {{pass}}
   var secondary_nav = $('<ul class="managed_html_secondary_nav"></ul>');
   secondary_nav.append($('<li><a target="_blank" href="'+live_url+'" style="color:pink;">Check Live Site</a></li>'));
+  secondary_nav.append($('<li>').
+    append($('<a href="javascript:void();" class="move_topbar" style="color:pink;">Down</a><a href="#" class="move_topbar" style="display:none;color:pink;">Top</a>').
+      click(function(){
+        $(".move_topbar").toggle();
+        if($('.move_topbar:visible').text() == 'Down'){
+          var offset = menuYloc+$(document).scrollTop()+"px";
+          topbar.animate({top:offset},{duration:500,queue:false});
+        }else{
+          var offset = window.innerHeight-40+menuYloc+$(document).scrollTop()+"px";
+          topbar.animate({top:offset},{duration:500,queue:false});
+        }
+      })
+    ));
   
   inner.append(brand);
   inner.append(nav);
