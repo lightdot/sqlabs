@@ -142,7 +142,7 @@ function managed_html_web2py_trap_form(action,target) {
       });
    });
 }
-function managed_html_web2py_ajax_page(method,action,data,target) {
+function managed_html_web2py_ajax_page(method,action,data,target,callback) {
   jQuery.ajax({'type':method,'url':action,'data':data,
     'beforeSend':function(xhr) {
       jQuery('#'+target).managed_html_spinner();
@@ -165,15 +165,16 @@ function managed_html_web2py_ajax_page(method,action,data,target) {
       web2py_ajax_init();  
       if(command) eval(command);
       if(flash) jQuery('.flash').html(flash).slideDown();
+      if(callback) callback();
       }
     });
 }
-function managed_html_ajax_page(action, data, target) {
+function managed_html_ajax_page(action, data, target, callback) {
   jQuery('.flash').hide().html(''); 
   if (target.slice(0, 21) == 'managed_html_content_') {
     managed_html_editing(target, data._action=='edit' || data._action=='revert');
   }
-  managed_html_web2py_ajax_page('post', action, data, target);
+  managed_html_web2py_ajax_page('post', action, data, target, callback);
 }
 
 // ---------------------------------------------------------------------------

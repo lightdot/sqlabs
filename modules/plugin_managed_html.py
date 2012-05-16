@@ -280,6 +280,7 @@ class ManagedHTML(object):
             URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
+            URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.css'),
             ]
@@ -602,13 +603,14 @@ jQuery(function(){
                     
             if (EDIT_MODE in self.view_mode and request.ajax and
                     self.keyword in request.vars and request.vars[self.keyword] == name):
-                    
+                
                 import cStringIO
                 action = request.vars.get('_action')
+                
                 if action in ('edit', 'revert'):
                     if not settings.editable:
                         raise HTTP(400)
-                        
+                    
                     if action == 'revert':
                         response.flash = T('Reverted')
                         content = self._get_content(name, id=request.vars.content_id)
@@ -630,16 +632,15 @@ jQuery(function(){
                             field.widget = field.widget or self.text_widget
                             field.requires = IS_HTML()
                             
-                            # if field.name in request.vars:
-                                # from plugin_elrte_widget import strip
-                                # request.vars[field.name] = strip(request.vars[field.name])
-        
                         elif field.type.startswith('list:'):
                             if field.name + '[]' in request.vars:
                                 request.vars[field.name] = [v for v in request.vars[field.name + '[]'] if v]
                                 if field.type == 'list:integer' or field.type.startswith('list:reference'):
                                     request.vars[field.name] = map(int, request.vars[field.name])
                             
+                        if field.name == 'handlebars':
+                            virtual_record[field.name] = self.convert_handlebars(name, virtual_record[field.name])
+
                     form = SQLFORM(
                         DAL(None).define_table('no_table', *fields),
                         virtual_record,
@@ -652,26 +653,24 @@ jQuery(function(){
                         for field in fields:
                             field_value = form.vars[field.name]
                             data[field.name] = field_value
-                            
+
                         table_content = settings.table_content
                         self.db(table_content.name == name)(table_content.publish_on == None).delete()
                         table_content.insert(name=name, data=json.dumps(data))
-                        content = self._get_content(name)
                         
                         response.flash = T('Edited')
-                        response.js = 'managed_html_published("%s", false);' % el_id
-                        response.js += 'managed_html_editing("%s", false);' % el_id
+                        response.js = 'window.location.reload();'
                         
-                        response.body = cStringIO.StringIO()
-                        _func(content)
-                        raise HTTP(200, response.body.getvalue())
+                        raise HTTP(200, '')
                         
                     if len(fields) == 1:
                         form.components = [form.custom.widget[fields[0].name]]
                         
                     form.components += [INPUT(_type='hidden', _name=self.keyword, _value=name),
                                INPUT(_type='hidden', _name='_action', _value='edit')]
-                    raise HTTP(200, DIV(form, _class='managed_html_content_inner'))
+                    content = self._get_content(name)
+                    
+                    raise HTTP(200, DIV(form))
                     
                 elif action in ('back', 'publish_now'):
                     content = self._get_content(name)
@@ -688,7 +687,14 @@ jQuery(function(){
                     response.body = cStringIO.StringIO()
                     _func(content)
                     raise HTTP(200, response.body.getvalue())
-                   
+
+                elif action in ('unique_key'):
+                    from gluon.utils import web2py_uuid
+                    raise HTTP(200, web2py_uuid())
+                elif action == 'show_add_content':
+                    if not settings.editable:
+                        raise HTTP(400)
+                    raise HTTP(200, self._add_content(name, request.vars['_target_el']))
                 else:
                     raise RuntimeError
                 
@@ -698,8 +704,8 @@ jQuery(function(){
                 if EDIT_MODE in self.view_mode:
                     is_published = self._is_published(content)
                     
-                    response.write(XML('<div id="%s" class="managed_html_content_block %s">' %
-                                        (el_id, 'managed_html_content_block_pending' if not is_published else '')))
+                    response.write(XML('<div id="%s" class="managed_html_content_block %s" content_type="%s">' %
+                                        (el_id, 'managed_html_content_block_pending' if not is_published else '', kwargs.get('content_type', ''))))
                     
                     # === write content ===
                     response.write(XML('<div id="%s" class="managed_html_content">' % content_el_id))
@@ -779,9 +785,37 @@ jQuery(function(){
             current.response.flash = ''
             return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' +
                               self._post_collection_js(name, 'add', content_type=form.vars.content_type)))
-            
         return form
         
+    def _add_content(self, name, target_el):
+        T = current.T
+        form = SQLFORM.factory(
+            Field('content_type',
+                  requires=IS_IN_SET(self.settings.content_types.keys(), zero=None)),
+            submit_button=T('Submit'),
+        )
+        
+        if form.validate():
+            current.response.flash = ''
+            from gluon.utils import web2py_uuid
+            uuld = web2py_uuid()
+            return DIV(SCRIPT('jQuery(".managed_html_dialog").hide();' + 
+                              """
+    var baseEl,
+    baseEl = $('[handlebars_id=%s]');
+    if (baseEl.attr('handlebars_id') === void 0) {
+      baseEl = baseEl.closest(".handlebars_content_block");
+    }
+    var $data, form, load;
+    load = '<div>{{load type="%s" name="%s"}}</div>';
+    form = "#managed_html_content_form_%s";
+    $data = $($('<div>').append($(form + " form textarea").text()));
+    $data.find('[handlebars_id=' + baseEl.attr('handlebars_id') + ']').after(load);
+    $(form + " form textarea").text($data.html());
+    baseEl.after($('<div handlebars_id="%s" contenteditable="false" class="new_content_block" content_type="%s"><div class="managed_html_content_anchor" onclick="">&nbsp;</div><div onclick="" class="managed_html_content_inner"><div class="managed_html_empty_content">&nbsp;</div></div></div>'));
+"""%(target_el, form.vars.content_type, uuld, name, uuld, form.vars.content_type)))
+        return form
+
     def collection_block(self, name, **kwargs):
         request, response, session, T, settings = (
             current.request, current.response, current.session, current.T, self.settings)
@@ -980,3 +1014,15 @@ jQuery(function(){
                     response.write(XML('</div>'))
             return wrapper
         return _decorator
+    
+    def convert_handlebars(self, name, html):
+        from BeautifulSoup import BeautifulSoup, Tag
+        contents = BeautifulSoup(html, fromEncoding="utf-8")
+        
+        i = 0
+        for content in contents.findAll(["div"]):
+            if isinstance(content, Tag):
+                content['handlebars_id'] = '%s_%s'%(name, i)
+                content['class'] = 'handlebars_content_block'
+                i = i + 1
+        return unicode(str(contents))
