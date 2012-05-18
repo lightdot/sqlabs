@@ -945,3 +945,7 @@ div.tmp_managed_html_content_block:hover > * {
 .dropdown{
   text-align:left;
 }
+
+div.workzone textarea{
+  width:100%;
+}
