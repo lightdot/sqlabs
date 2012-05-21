@@ -759,7 +759,11 @@ jQuery(function(){
         self.write_managed_html(**kwdargs)()
     
     def url_helper(self, this, **kwdargs):
-        current.response.write(XML(current.response.page_url(kwdargs.get('page')) + kwdargs.get('anchor')).xml(), escape=False)
+        if 'page' in kwdargs:
+            href = current.response.page_url(kwdargs['page'], kwdargs.get('tenant', None))
+        else:
+            href = ""
+        current.response.write(XML(href).xml(), escape=False)
     
     def write_managed_html(self, **kwdargs):
         name = kwdargs.get('name')
