@@ -872,6 +872,9 @@ jQuery(function($) {
             def _(content):
                 from gluon.utils import web2py_uuid
                 uuid = web2py_uuid()
+                if not content.gallery:
+                    current.response.write(XML('Gallery'), escape=False)
+                    return
                 files = self.db(self.db.managed_html_file.id.belongs(content.gallery.split(','))).select()
                 current.response.write(XML("""<div id='%s'>"""%uuid).xml(),escape=False)
                 for file in files:
