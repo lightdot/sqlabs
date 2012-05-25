@@ -424,7 +424,7 @@ class ManagedHTML(object):
                     SPAN(self.solidgrid.settings.recordbutton('ui-icon-seek-next', T('Select'),
                             '#', _onclick="""
 jQuery('img[src=dummy-image]').attr('src', jQuery(this).closest('tr').find('textarea').val());jQuery('#managed_html_image_chooser').remove();
-                            """ , _class='ui-btn'))},
+                            """ , _class='ui-btn', _file_id=row.id))},
              {'label': T('File'), 'width': '150px;',
               'content':lambda row, rc: DIV(
                 DIV(self._file_represent(row.name, row.thumbnail)),
@@ -859,4 +859,37 @@ jQuery(function($) {
 </script>
 <div id="content_%s"></div>
 """%(name, content.template or '<table width="400px"></table>', name)))              
+            return _
+        
+        elif content_type == 'gallery':
+            @self.content_block(kwdargs.get('name'), 
+                                Field('gallery', label='gallery', default=''),
+                                Field('width', label='width', default='500'),
+                                Field('height', label='height', default='300'), 
+                                Field('effect', label='effect', default='wave'), 
+                                Field('delay', label='delay', default='5'), 
+                                parent=None, content_type=content_type)
+            def _(content):
+                from gluon.utils import web2py_uuid
+                uuid = web2py_uuid()
+                files = self.db(self.db.managed_html_file.id.belongs(content.gallery.split(','))).select()
+                current.response.write(XML("""<div id='%s'>"""%uuid).xml(),escape=False)
+                for file in files:
+                    current.response.write(XML("""<img file_id='%s' src='/akamon_systemtoyo/static/uploads/contents/%s'/>"""%(file.id, file.name)).xml(),escape=False)
+                current.response.write(XML("""
+</div>
+<script type="text/javascript" src="%s"></script>
+<script type="text/javascript">
+jQuery(function($) {
+  $('#%s').jqFancyTransitions({ width: %s, height: %s , effect: '%s', delay: %s});
+});
+</script>
+"""%(URL(APP, 'static', 'plugin_managed_html/jqFancyTransitions.1.8.min.js'),
+     uuid,
+     content.width, 
+     content.height, 
+     content.effect,
+     int(content.delay or 5) * 1000,
+     )).xml(), 
+     escape=False)
             return _
