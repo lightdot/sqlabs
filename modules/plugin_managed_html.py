@@ -898,3 +898,13 @@ jQuery(function($) {
      )).xml(), 
      escape=False)
             return _
+
+        elif content_type == 'script':
+            @self.content_block(kwdargs.get('name'), 
+                                Field('script', label='script', default=''),
+                                parent=None, content_type=content_type)
+            def _(content):
+                if EDIT_MODE in self.view_mode:
+                    current.response.write(XML('<div style="position:absolute;"><b>script</b></div>'))
+                current.response.write(XML(content.script), escape=False)
+            return _

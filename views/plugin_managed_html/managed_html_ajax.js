@@ -185,7 +185,7 @@ function managed_html_web2py_ajax_page(method,action,data,target,callback,escape
       var command=xhr.getResponseHeader('web2py-component-command');
       var flash=xhr.getResponseHeader('web2py-component-flash');
       
-      if (escape == true) {html = html.split("document.write").join("");}
+      html = html.split("document.write").join("");
 
       var t = jQuery('#'+target);
       if(content=='prepend') t.prepend(html); 
