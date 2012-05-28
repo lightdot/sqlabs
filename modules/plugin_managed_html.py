@@ -298,7 +298,7 @@ class ManagedHTML(object):
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
             URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
+            #URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
             URL('static', 'plugin_smarteditor_widget/font_size.js'),
