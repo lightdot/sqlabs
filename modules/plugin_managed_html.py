@@ -343,7 +343,7 @@ class ManagedHTML(object):
                             '#', _class='ui-btn'))},
         ]
         
-        content_name = request.vars.get(self.history_grid_keyword, request.args(2))
+        content_name = request.vars.get(self.history_grid_keyword, request.args(3))
         query = (table_content.name == content_name)
         grid = self.solidgrid(
             query,
