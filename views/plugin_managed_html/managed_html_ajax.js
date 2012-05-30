@@ -173,13 +173,13 @@ function managed_html_web2py_trap_form(action,target) {
 function managed_html_web2py_ajax_page(method,action,data,target,callback,escape) {
   jQuery.ajax({'type':method,'url':action,'data':data,
     'beforeSend':function(xhr) {
-      jQuery('#'+target).managed_html_spinner();
+      //jQuery('#'+target).managed_html_spinner();
       xhr.setRequestHeader('web2py-component-location',document.location);
       xhr.setRequestHeader('web2py-component-element',target);
     },
     'complete':function(xhr,text){
-      jQuery('#'+target).managed_html_spinner('remove');
-      jQuery('.managed_html_spinner').hide(); // TODO
+      //jQuery('#'+target).managed_html_spinner('remove');
+      //jQuery('.managed_html_spinner').hide(); // TODO
       var html=xhr.responseText;
       var content=xhr.getResponseHeader('web2py-component-content'); 
       var command=xhr.getResponseHeader('web2py-component-command');
@@ -428,12 +428,12 @@ function managed_html_movable(name, indices, keyword, url, confirm_message) {
               from_el.css({left:'0px', top:'0px'});
             },
             beforeSend:function(xhr) {
-              to_parent.managed_html_spinner();
+              //to_parent.managed_html_spinner();
               xhr.setRequestHeader('web2py-component-location',document.location);
               xhr.setRequestHeader('web2py-component-element',el.attr('id'));
               jQuery('.flash').hide().html('');},
             complete: function(xhr, text) {
-              to_parent.managed_html_spinner('remove');
+              //to_parent.managed_html_spinner('remove');
               var flash=xhr.getResponseHeader('web2py-component-flash');
               if(flash) jQuery('.flash').html(flash).slideDown();
             }
