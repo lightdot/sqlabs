@@ -114,7 +114,7 @@ class ManagedHTML(object):
         self.view_mode = LIVE_MODE
         settings.devices = [{'name':'pc', 'label':'PC', 'show_side_view':False},
                             {'name':'mobile', 'label':'Smart-Phone', 'request_updator':{'is_mobile':True}, 'show_side_view':True, 'view_width':'320'}]
-        
+
     def url(self, a=None, c=None, f=None, r=None, args=None, vars=None, **kwds):
         if not r:
             if a and not c and not f:
@@ -299,7 +299,6 @@ class ManagedHTML(object):
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
             URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
             URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
-            #URL('static', 'plugin_smarteditor_widget/smarteditor.bootstrap.js'),
             URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
             URL('static', 'plugin_smarteditor_widget/font_size.js'),
@@ -771,11 +770,13 @@ jQuery(function(){
     def write_managed_html(self, **kwdargs):
         name = kwdargs.get('name')
         content_type = kwdargs.get('type')
+        
         if content_type == 'html':
             @self.content_block(kwdargs.get('name'), Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), parent=None, content_type=content_type)
             def _(content):
                 current.response.write(XML(content.html).xml(), escape=False)
             return _
+        
         elif content_type == 'handlebars':
             @self.content_block(kwdargs.get('name'), 
                     Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), 
@@ -800,112 +801,11 @@ jQuery(function(){
                                 current.response.write(XML('<span style="color:red">handlebars error : %s</span>'%e.message).xml(), escape=False)
                     else:
                         current.response.write(XML('<div class="managed_html_empty_content">&nbsp;</div>').xml(), escape=False)
-                    pass
                     self.settings._handlebars_stack.remove(name)
                 else:
                     if current.request.is_managed_html_mode:
                         current.response.write(XML('<span style="color:red">handlebars error : infinite loop "%s"</span>'%name).xml(), escape=False)
             return _
-        elif content_type == 'google_map':
-            @self.content_block(name, 
-                                    Field('title', label='タイトル', default='芝公園'),
-                                    Field('lat', label='緯度', default='35.654071'), 
-                                    Field('long', label='経度', default='139.749838'),
-                                    Field('marker_lat', label='マーカー緯度', default='35.654071'),
-                                    Field('marker_long', label='マーカー経度', default='139.749838'),
-                                    Field('marker_image', label='マーカー画像'),
-                                    Field('template', 'text', label="テンプレート", default='<div id="map1" class="map" style="height:200px"></div>', widget=SQLFORM.widgets.text.widget), parent=kwdargs.get('parent'), content_type=content_type)
-            def _(content):
-                if not content:
-                    current.response.write(XML('GoogleMap'), escape=False)
-                current.response.write(XML("""
-<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-<script type="text/javascript">
-jQuery(function($) {
-  
-  var source   = $("#template_%s").html();
-  var template = Handlebars.compile(source);
-  var context  = {title: "%s"}
-  $('#content_%s').html(template(context));
-"""%(name, content.title, name)))
-                if content.template:
-                    current.response.write(XML("""
-    var latlng = new google.maps.LatLng(%s,%s);
-    var opts = {
-      zoom: 15,
-      center: latlng,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
+            
+        return self.settings.content_types.get(content_type).content_block(self, kwdargs)
 
-    var map = new google.maps.Map($("#content_%s .map")[0], opts);
-    var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(%s,%s),
-          map: map,
-          title: '%s'
-    });
-    
-    var content = '<img src="%s" alt="%s"><br/>%s';
-    var infowindow = new google.maps.InfoWindow({
-      content: content ,
-      size: new google.maps.Size(50, 50)
-    });
-    
-    google.maps.event.addListener(marker, 'click', function() {
-      infowindow.open(map, marker);
-    });              
-"""%(content.lat, content.long, name, content.marker_lat, content.marker_long, content.title, content.marker_image, content.title, content.title)))
-                current.response.write(XML("""
-});
-</script>
-<script id="template_%s" type="text/x-handlebars-template">
-  %s
-</script>
-<div id="content_%s"></div>
-"""%(name, content.template or '<table width="400px"></table>', name)))              
-            return _
-        
-        elif content_type == 'gallery':
-            @self.content_block(kwdargs.get('name'), 
-                                Field('gallery', label='gallery', default=''),
-                                Field('width', label='width', default='500'),
-                                Field('height', label='height', default='300'), 
-                                Field('effect', label='effect', default='wave'), 
-                                Field('delay', label='delay', default='5'), 
-                                parent=None, content_type=content_type)
-            def _(content):
-                from gluon.utils import web2py_uuid
-                uuid = web2py_uuid()
-                if not content.gallery:
-                    current.response.write(XML('Gallery'), escape=False)
-                    return
-                files = self.db(self.db.managed_html_file.id.belongs(content.gallery.split(','))).select()
-                current.response.write(XML("""<div id='%s'>"""%uuid).xml(),escape=False)
-                for file in files:
-                    current.response.write(XML("""<img file_id='%s' src='/akamon_systemtoyo/static/uploads/contents/%s'/>"""%(file.id, file.name)).xml(),escape=False)
-                current.response.write(XML("""
-</div>
-<script type="text/javascript" src="%s"></script>
-<script type="text/javascript">
-jQuery(function($) {
-  $('#%s').jqFancyTransitions({ width: %s, height: %s , effect: '%s', delay: %s});
-});
-</script>
-"""%(URL(APP, 'static', 'plugin_managed_html/jqFancyTransitions.1.8.min.js'),
-     uuid,
-     content.width, 
-     content.height, 
-     content.effect,
-     int(content.delay or 5) * 1000,
-     )).xml(), 
-     escape=False)
-            return _
-
-        elif content_type == 'script':
-            @self.content_block(kwdargs.get('name'), 
-                                Field('script', 'text', label='script', default='', widget=SQLFORM.widgets.text.widget),
-                                parent=None, content_type=content_type)
-            def _(content):
-                if EDIT_MODE in self.view_mode:
-                    current.response.write(XML('<div style="position:absolute;"><b>script</b></div>'))
-                current.response.write(XML(content.script), escape=False)
-            return _
