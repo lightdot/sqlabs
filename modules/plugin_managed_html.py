@@ -293,6 +293,7 @@ class ManagedHTML(object):
             URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_managed_html/aop.min.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/jquery-ui-1.8.16.custom.min.js'),
+            URL(APP, 'static', 'plugin_elrte_widget/js/elrte.min.js'),
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
             URL('static', 'plugin_smarteditor_widget/underscore.js'),
             URL('static', 'plugin_smarteditor_widget/backbone.js'),
