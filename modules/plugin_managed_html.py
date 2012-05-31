@@ -901,7 +901,7 @@ jQuery(function($) {
 
         elif content_type == 'script':
             @self.content_block(kwdargs.get('name'), 
-                                Field('script', label='script', default=''),
+                                Field('script', 'text', label='script', default='', widget=SQLFORM.widgets.text.widget),
                                 parent=None, content_type=content_type)
             def _(content):
                 if EDIT_MODE in self.view_mode:
