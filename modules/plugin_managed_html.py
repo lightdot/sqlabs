@@ -103,20 +103,17 @@ class ManagedHTML(object):
         settings._handlebars_compiler = Compiler(current.response)
         settings._handlebars_stack = []
 
-        def _html(name, parent=None):
-            @self.content_block(name, Field('html', 'text'), parent=parent)
-            def _(content):
-                current.response.write(XML(content.html or '').xml(), escape=False)
-            _()
-            return ''
-        settings.content_types = Storage(html=_html)
+        settings.content_types = Storage()
+        self.settings.smarteditor_plugins = []
+        import applications.sqlabs.modules.plugin_managed_handlebars as plugin_managed_handlebars
+        plugin_managed_handlebars.setup(self)
         
         self.view_mode = LIVE_MODE
         settings.devices = [{'name':'pc', 'label':'PC', 'show_side_view':False},
                             {'name':'mobile', 'label':'Smart-Phone', 'request_updator':{'is_mobile':True}, 'show_side_view':True, 'view_width':'320'}]
         
-        self.settings.smarteditor_plugins = []
         
+
     def url(self, a=None, c=None, f=None, r=None, args=None, vars=None, **kwds):
         if not r:
             if a and not c and not f:
@@ -772,44 +769,4 @@ jQuery(function(){
         current.response.write(XML(href).xml(), escape=False)
     
     def write_managed_html(self, **kwdargs):
-        name = kwdargs.get('name')
-        content_type = kwdargs.get('type')
-        
-        if content_type == 'html':
-            @self.content_block(kwdargs.get('name'), Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), parent=None, content_type=content_type)
-            def _(content):
-                current.response.write(XML(content.html).xml(), escape=False)
-            return _
-        
-        elif content_type == 'handlebars':
-            @self.content_block(kwdargs.get('name'), 
-                    Field(content_type, 'text', widget=SQLFORM.widgets.text.widget), 
-                    parent=None, content_type=content_type)
-            def _(content):
-                if name not in self.settings._handlebars_stack:
-                    self.settings._handlebars_stack.append(name)
-                    if content.handlebars:
-                        try:
-                            tree = content.handlebars_tree
-                            if tree:
-                                from pprint import pprint
-                                #pprint(tree)
-                                code = self.settings._handlebars_compiler._compiler(tree).apply('compile')[0]
-                                code({}, helpers={'load': self.load_handlebars, 'url':self.url_helper})
-                            else:
-                                self.settings._handlebars_compiler.compile(name, '', content.handlebars)({}, helpers={'load': self.load_handlebars, 'url':self.url_helper})
-                        except HTTP as e:
-                            raise
-                        except Exception as e:
-                            if current.request.is_managed_html_mode:
-                                current.response.write(XML('<span style="color:red">handlebars error : %s</span>'%e.message).xml(), escape=False)
-                    else:
-                        current.response.write(XML('<div class="managed_html_empty_content">&nbsp;</div>').xml(), escape=False)
-                    self.settings._handlebars_stack.remove(name)
-                else:
-                    if current.request.is_managed_html_mode:
-                        current.response.write(XML('<span style="color:red">handlebars error : infinite loop "%s"</span>'%name).xml(), escape=False)
-            return _
-            
-        return self.settings.content_types.get(content_type)(self, kwdargs)
-
+        return self.settings.content_types.get(kwdargs.get('type'))(self, kwdargs)
