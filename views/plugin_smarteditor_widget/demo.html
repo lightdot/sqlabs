@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="robots" content="index,follow" />
+<title>企業検索 | IRアドバイザー</title>
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+
+<link href="/ir_admin/static/plugin_bootstrap2/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" />
+<link href="/ir_admin/static/plugin_bootstrap2/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css" />
+
+
+<!--<link href="/static/demo/default.css" rel="stylesheet" type="text/css" />-->
+<link href="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/css/defaults.css" rel="stylesheet" type="text/css" />
+<link href="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/css/company.css" rel="stylesheet" type="text/css" />
+<link href="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/css/fs_m.css" rel="stylesheet" type="text/css" title="fm" />
+<link href="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/css/fs_s.css" rel="alternate stylesheet" type="text/css" title="fs" />
+<link href="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/css/fs_l.css" rel="alternate stylesheet" type="text/css" title="fl" />
+<script type="text/javascript" src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/js/footerFixed.js"></script>
+<script type="text/javascript" src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/js/jquery.rollover.js"></script>
+<script type="text/javascript" src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/js/styleswitch.js"></script>
+<script type="text/javascript" src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/inc/js/setting.js"></script>
+
+
+<link href="/ir_admin/static/backbone-forms/src/backbone-forms.css" rel="stylesheet" type="text/css" />
+
+<script src="/ir_admin/static/plugin_smarteditor/underscore.js" type="text/javascript"></script>
+<script src="/ir_admin/static/plugin_smarteditor/backbone.js" type="text/javascript"></script>
+<script src="/ir_admin/static/backbone-forms/src/backbone-forms.js" type="text/javascript"></script>
+<script src="/ir_admin/static/plugin_smarteditor/smarteditor.bootstrap.js" type="text/javascript"></script>
+<script src="/ir_admin/static/plugin_smarteditor/smarteditor.js" type="text/javascript"></script>
+<link href="/ir_admin/static/plugin_smarteditor/smarteditor.css" rel="stylesheet" type="text/css" />
+
+  <script language="JavaScript">
+  var width_filter = '.container'
+  var controller   = '/ir_admin/default/screensize'
+  </script>
+  <link rel="stylesheet" type="text/css" href="/ir_admin/static/plugin_bootstrap2/responsivekit.css" />
+  <script src="/ir_admin/static/plugin_bootstrap2/responsivekit.js"></script>
+  <script src="/ir_admin/static/plugin_bootstrap2/bootstrap/js/bootstrap.js"></script>
+
+<style>
+
+#mainColumn {
+  float: left;
+}
+
+</style>
+
+
+</head>
+<body id="company">
+<div id="wrap"> <a name="pagetop" id="pagetop"></a>
+<div id="container">
+<div id="header">
+<div class="content">
+<h1><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/img_hd_logo.gif" alt="IRアドバイザー" /></h1>
+<ul class="fontResize">
+<li><a href="?style=fs" rel="fs" class="styleswitch"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/img_fs_s.gif" title="fs" alt="" /></a></li>
+<li><a href="?style=fm" rel="fm" class="styleswitch"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/img_fs_m.gif" title="fm" alt="" /></a></li>
+<li><a href="?style=fl" rel="fl" class="styleswitch"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/img_fs_l.gif" title="fl" alt="" /></a></li>
+</ul>
+</div>
+<div id="gNav">
+<ul>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/default/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav01.gif" alt="ホーム" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/news/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav02.gif" alt="What's New" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/report/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav03.gif" alt="アナリストレポート" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/interview/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav04.gif" alt="インタビュー" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/ranking/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav05.gif" alt="株主通信" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/search/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav06_on.gif" alt="企業検索" /></a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/event/index"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/btn_gnav07.gif" alt="イベント" /></a></li>
+</ul>
+</div>
+<!-- /#gNav -->
+</div>
+<!-- /#header -->
+<div id="contents" class="column2 row">
+
+<div id="sideColumn" class="span4">
+<h2>企業情報</h2>
+<div id="sNav">
+<ul>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/index">Message：企業理念</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/executives">Executives：役員構成</a></li>
+<li class="current"><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/access">Access：所在地</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/history">History：会社沿革</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/release_index">Release：会社発表</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/works_index">Works：主要事業</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/movie_index">Movie：動画</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/enquete_index">Enquete：アンケート</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/recruit_index">Recruit：人材募集</a></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/update">Updates：更新履歴</a></li>
+<li class="bEdge"><a href="http://mtir.s-cubism-nz.com:8080/ir_front/company/service_index">New Service：新サービス</a></li>
+</ul>
+<ul id="menuMore">
+<li><a href="#">○○○</a></li>
+<li class="bEdge"><a href="#">○○○</a></li>
+</ul>
+</div>
+<!-- /#sNav -->
+
+</div>
+<!-- /#sideColumn -->
+
+<div id="mainColumn" class="span8">
+
+<div id="topicPath">
+<p><span><a href="http://mtir.s-cubism-nz.com:8080/ir_front/default/index">ホーム</a></span><span><a href="http://mtir.s-cubism-nz.com:8080/ir_front/search/index">企業検索</a></span><span><a href="http://mtir.s-cubism-nz.com:8080/ir_front/default/index">株式会社マスチューン</a></span><span class="current">所在地</span></p>
+</div>
+<!-- /#topicPath -->
+
+<div class="contentFrame c_Detail_Acc">
+<div class="hTitle cTitle">
+<h2>株式会社マスチューン</h2>
+<div class="clearFix">
+<p><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/search/ico_cat_12.gif" alt="" />
+<img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/search/ico_cat_14.gif" alt="" />
+<img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/search/ico_cat_19.gif" alt="" />
+</p>
+</div>
+<!-- /.clearFix -->
+<div class="txt">東京都神楽坂にオフィスを構えるITベンチャー。日本最大級の個人投資家コミュニティ『みんなの株式』及び『みんなの為替』を運営。
+新たに企業のコミュニケーションプラットフォームを目指す『日本の活力』を手掛ける。
+</div>
+<div class="txt"><span>決算：3月</span><span>本社所在地：東京都新宿区矢来町114番地</span><span>HP：<a href="http://masstune.co.jp/index.html" target="_blank">http://masstune.co.jp/</a></span>
+</div>
+</div>
+
+<div class="innerContent">
+<p class="dotline">&nbsp;</p>
+<h4>Access （所在地）</h4>
+<h5>神楽坂本社</h5>
+<p>東京都新宿区矢来町114番地　高橋ビル　（東京メトロ東西線神楽坂駅から徒歩約1分）</p>
+<p class="aCenter mB30"><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/search/img_access_map.jpg" alt="" /></p>
+
+</div>
+<!-- /.innerContent -->
+</div>
+<!-- /.c_Detail_Acc -->
+
+
+</div>
+<!-- /#mainColumn -->
+
+</div>
+<!-- /#contents -->
+
+</div>
+<!-- /#container -->
+
+<div id="footer">
+<ul class="content">
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/management">運営会社</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/rules">利用規約</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/privacy">プライバシーポリシー</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/privacy_statement">プライバシー・ステートメント</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/tokusyo">特定商取引表示</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/law">ご利用上の注意（関連法規）</a><img src="http://mtir.s-cubism-nz.com:8080/ir_front/static/adviser/img/common/bg_footer_bline.gif" alt="" /></li>
+<li class="rEdge"><a href="http://mtir.s-cubism-nz.com:8080/ir_front/about/faq">ヘルプ/FAQ</a></li>
+</ul>
+<p>Copyright (C) MASSTUNE, Inc. All rights reserved.</p>
+</div>
+<!-- /#footer -->
+
+</div>
+<!-- /#wrap -->
+
+</body>
+</html>

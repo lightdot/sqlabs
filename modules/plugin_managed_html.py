@@ -114,7 +114,9 @@ class ManagedHTML(object):
         self.view_mode = LIVE_MODE
         settings.devices = [{'name':'pc', 'label':'PC', 'show_side_view':False},
                             {'name':'mobile', 'label':'Smart-Phone', 'request_updator':{'is_mobile':True}, 'show_side_view':True, 'view_width':'320'}]
-
+        
+        self.settings.smarteditor_plugins = []
+        
     def url(self, a=None, c=None, f=None, r=None, args=None, vars=None, **kwds):
         if not r:
             if a and not c and not f:
@@ -284,28 +286,29 @@ class ManagedHTML(object):
             if not self.settings.editable:
                 raise HTTP(400)
             raise HTTP(200, self._history_grid(args=args))
-                
         _files = [
             URL(APP, 'static', 'plugin_managed_html/managed_html.css'),
-            URL('static', 'plugin_bootstrap2/bootstrap.min.css'),
-            URL('static', 'plugin_bootstrap2/bootstrap.min.js'),
-            URL('static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
+            URL(APP, 'static', 'plugin_bootstrap2/bootstrap.min.css'),
+            URL(APP, 'static', 'plugin_bootstrap2/bootstrap.min.js'),
+            URL(APP, 'static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
             URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_managed_html/aop.min.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/jquery-ui-1.8.16.custom.min.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/elrte.min.js'),
             URL(APP, 'static', 'plugin_managed_html/bootstrap-dropdown.js'),
-            URL('static', 'plugin_smarteditor_widget/underscore.js'),
-            URL('static', 'plugin_smarteditor_widget/backbone.js'),
-            URL('static', 'plugin_smarteditor_widget/backbone-forms.js'),
-            URL('static', 'plugin_smarteditor_widget/backbone-forms.css'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor.coffee'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor_plugins.coffee'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
-            URL('static', 'plugin_smarteditor_widget/font_size.js'),
-            URL('static', 'plugin_smarteditor_widget/nytpanel_models.editor.coffee'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
-            URL('static', 'plugin_smarteditor_widget/smarteditor.css'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/underscore.js'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/backbone.js'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/backbone-forms.js'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/backbone-forms.css'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/smarteditor.coffee'),
+            ]
+        _files = _files+self.settings.smarteditor_plugins
+        _files = _files+[
+            URL(APP, 'static', 'plugin_smarteditor_widget/smarteditor_widgets.coffee'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/font_size.js'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/nytpanel_models.editor.coffee'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/smarteditor_models.akamon.coffee'),
+            URL(APP, 'static', 'plugin_smarteditor_widget/smarteditor.css'),
             ]
         response.files[:0] = [f for f in _files if f not in response.files]
             
@@ -808,5 +811,5 @@ jQuery(function(){
                         current.response.write(XML('<span style="color:red">handlebars error : infinite loop "%s"</span>'%name).xml(), escape=False)
             return _
             
-        return self.settings.content_types.get(content_type).content_block(self, kwdargs)
+        return self.settings.content_types.get(content_type)(self, kwdargs)
 

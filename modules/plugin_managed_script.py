@@ -7,6 +7,10 @@ from gluon import *
 import os
 APP = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
 
+def setup(managed_html):
+    managed_html.settings.smarteditor_plugins.append(URL(APP, 'static', 'plugin_managed_script/smarteditor_plugin.coffee'))
+    managed_html.settings.content_types['script'] = content_block
+
 def content_block(managed_html, kwdargs):
     name = kwdargs.get('name')
     content_type = kwdargs.get('type')
