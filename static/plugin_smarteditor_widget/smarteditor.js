@@ -573,9 +573,9 @@ Exposed global class
 
     function SmartEditorPlugins() {}
 
-    SmartEditorPlugins.edit_dialog = {
-      'a': 'b'
-    };
+    SmartEditorPlugins.edit_dialog = {};
+
+    SmartEditorPlugins.contenteditable = [];
 
     return SmartEditorPlugins;
 

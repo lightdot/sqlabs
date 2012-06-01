@@ -1,3 +1,5 @@
+SmartEditorPlugins.contenteditable.push 'gallery'
+
 SmartEditorPlugins.edit_dialog['gallery'] = (@model, @view) =>
 
   baseEl = $(@model.targetEl)

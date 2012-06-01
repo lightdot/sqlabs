@@ -1,3 +1,5 @@
+SmartEditorPlugins.contenteditable.push 'google_map'
+
 SmartEditorPlugins.edit_dialog['google_map'] = (@model, @view) =>
   
   baseEl = $(@model.targetEl)

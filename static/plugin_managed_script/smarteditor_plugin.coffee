@@ -1,3 +1,5 @@
+SmartEditorPlugins.contenteditable.push 'script'
+
 SmartEditorPlugins.edit_dialog['script'] = (@model, @view) =>
 
   baseEl = $(@model.targetEl)

@@ -1,6 +1,8 @@
 (function() {
   var _this = this;
 
+  SmartEditorPlugins.contenteditable.push('gallery');
+
   SmartEditorPlugins.edit_dialog['gallery'] = function(model, view) {
     var baseEl, dialog;
     _this.model = model;

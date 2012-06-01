@@ -361,4 +361,6 @@ $ =>
 
 class @SmartEditorPlugins
 
-  @edit_dialog:{'a':'b'}
+  @edit_dialog: {}
+  
+  @contenteditable: []

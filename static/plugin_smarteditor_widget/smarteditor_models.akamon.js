@@ -96,7 +96,7 @@
     }
 
     ManagedHTMLView.prototype.initialize = function() {
-      var key, name, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _ref4;
+      var key, name, plugin, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _m, _ref, _ref2, _ref3, _ref4, _ref5;
       ManagedHTMLView.__super__.initialize.apply(this, arguments);
       for (key in this.model.schema) {
         if (this[key] != null) this.model.bind(key, this[key]);
@@ -138,7 +138,11 @@
         }
       }
       $('.managed_html_content_anchor_pending, .managed_html_content_anchor').attr("contenteditable", false);
-      $('[content_type=script],[content_type=gallery],[content_type=google_map]').attr("contenteditable", false).find('*').attr("contenteditable", false);
+      _ref5 = SmartEditorPlugins.contenteditable;
+      for (_m = 0, _len5 = _ref5.length; _m < _len5; _m++) {
+        plugin = _ref5[_m];
+        $('[content_type=' + plugin + ']').attr("contenteditable", false).find('*').attr("contenteditable", false);
+      }
       return this;
     };
 

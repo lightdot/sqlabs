@@ -42,7 +42,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.schema[name].disabled = false for name in ['move', 'insert', 'html_editor', 'delete']
       
     $('.managed_html_content_anchor_pending, .managed_html_content_anchor').attr "contenteditable", false
-    $('[content_type=script],[content_type=gallery],[content_type=google_map]').attr("contenteditable", false).find('*').attr("contenteditable", false)
+    
+    for plugin in SmartEditorPlugins.contenteditable
+      $('[content_type='+plugin+']').attr("contenteditable", false).find('*').attr("contenteditable", false)
     @
 
   openEdit: =>

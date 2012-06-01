@@ -1,6 +1,8 @@
 (function() {
   var _this = this;
 
+  SmartEditorPlugins.contenteditable.push('script');
+
   SmartEditorPlugins.edit_dialog['script'] = function(model, view) {
     var baseEl, dialog;
     _this.model = model;

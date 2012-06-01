@@ -1,6 +1,8 @@
 (function() {
   var _this = this;
 
+  SmartEditorPlugins.contenteditable.push('google_map');
+
   SmartEditorPlugins.edit_dialog['google_map'] = function(model, view) {
     var baseEl, dialog;
     _this.model = model;
