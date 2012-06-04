@@ -29,7 +29,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @el.content_id = @el.id.replace('managed_html_content_block_', '')
     @el.form_id = "managed_html_content_form_"+@el.content_id
     
-    if 0 < $(@model.targetEl).closest('[contenteditable=true]').length
+    if 0 < $(@model.get('targetEl')).closest('[contenteditable=true]').length
       @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
     else
       @model.schema[name].disabled = false for name in ['edit', 'history']
@@ -62,12 +62,16 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'locked': false
         'loading': false
-      @model.schema[name].disabled = false for name in ['edit', 'html_editor', 'history']
-      @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
-      if $('.managed_html_content_anchor_pending',@el).length
-        @model.schema[name].disabled = false for name in ['publish']
-      @model.trigger 'updatedSchema'
-      $('#'+@el.form_id).remove()
+#      @model.schema[name].disabled = false for name in ['edit', 'html_editor', 'history']
+#      @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
+#      if $('.managed_html_content_anchor_pending',@el).length
+#        @model.schema[name].disabled = false for name in ['publish']
+#      @model.trigger 'updatedSchema'
+#      $('#'+@el.form_id).remove()
+
+      hid = $(@model.get('targetEl'))?.attr('hid')
+      if hid? and $('[hid='+hid+']').length>0
+        smartEditor.resetTargetElement($('[hid='+hid+']')[0])
     @
 
   commit: (obj) =>
@@ -134,10 +138,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-      @model.schema[name].disabled = true for name in ['edit', 'html_editor', 'publish', 'history', 'edit']
-      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
-      @model.trigger 'updatedSchema'
-      
+#      @model.schema[name].disabled = true for name in ['edit', 'html_editor', 'publish', 'history', 'edit']
+#      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
+#      @model.trigger 'updatedSchema'
       $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
       if $('#'+@el.form_id+" form textarea").attr('name') != 'handlebars'
         @model.schema[name].disabled = true for name in ['insert', 'html_editor']
@@ -145,13 +148,19 @@ class ManagedHTMLView extends SmartEditor.ElementView
       
       if SmartEditorPlugins.edit_dialog[@$el.attr('content_type')]
         SmartEditorPlugins.edit_dialog[@$el.attr('content_type')](@model, this)
+
+      hid = $(@model.get('targetEl'))?.attr('hid')
+      if hid? and $('[hid='+hid+']').length>0
+        smartEditor.resetTargetElement($('[hid='+hid+']')[0])
+
+
     @
   
   html_editor: =>
     @model.set 
       'loading': true
       'locked': true
-    baseEl = $(@model.targetEl)
+    baseEl = $(@model.get('targetEl'))
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
 
@@ -206,7 +215,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @model.set 
       'loading': true
       'locked': true
-    baseEl = $(@model.targetEl)
+    baseEl = $(@model.get('targetEl'))
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
     dialog = SmartEditor.utils.dialog 'form_insert', "loading..." 
@@ -226,7 +235,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @
   
   delete: (obj) =>
-    baseEl = $(@model.targetEl)
+    baseEl = $(@model.get('targetEl'))
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
     baseEl = baseEl.closest(".handlebars_content_block")
@@ -244,7 +253,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @
 
   move: (obj) =>
-    baseEl = $(@model.targetEl)
+    baseEl = $(@model.get('targetEl'))
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
     baseEl.draggable().draggable('enable')
@@ -305,9 +314,10 @@ SmartEditor.factories.push (target_el) =>
   el = $(target_el).closest(".managed_html_content_block")[0]
 
   if el?
-    model = new ManagedHTMLModel()
+    model = new ManagedHTMLModel({
+      targetEl: target_el
+    })
     model.schema = SmartEditor.utils.clone model.schema
-    model.targetEl = target_el
     view = new ManagedHTMLView(
       model: model
       el: el

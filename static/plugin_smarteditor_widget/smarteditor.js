@@ -139,6 +139,7 @@ Exposed global class
 
     function SmartEditor() {
       this.onClick = __bind(this.onClick, this);
+      this.resetTargetElement = __bind(this.resetTargetElement, this);
       this._tunePos = __bind(this._tunePos, this);      this.mainPanelModel = new SmartEditor.MainPanelModel();
       this.mainPanelView = new SmartEditor.MainPanelView({
         model: this.mainPanelModel
@@ -159,6 +160,19 @@ Exposed global class
       if (pos.x < 0) pos.x = 0;
       pos.y = pos.y - 70;
       if (pos.y < 0) return pos.y = 0;
+    };
+
+    SmartEditor.prototype.resetTargetElement = function(elm) {
+      var targetModels;
+      if ($(elm).closest(SmartEditor.disableSelectors.join(',')).length) {
+        return true;
+      }
+      if (!this.mainPanelModel.get('targetLocked')) {
+        targetModels = this.findElementModels(elm);
+        return this.mainPanelModel.set({
+          targetModels: targetModels
+        });
+      }
     };
 
     SmartEditor.prototype.onClick = function(e) {

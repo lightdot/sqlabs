@@ -140,6 +140,13 @@ class @SmartEditor
     pos.y = pos.y - 70
     pos.y = 0  if pos.y < 0
 
+  resetTargetElement: (elm) =>
+    if $(elm).closest(SmartEditor.disableSelectors.join(',')).length
+      return true
+    if not @mainPanelModel.get('targetLocked')
+      targetModels = @findElementModels(elm)
+      @mainPanelModel.set targetModels: targetModels
+
   onClick: (e) =>
     if $(e.target).closest(SmartEditor.disableSelectors.join(',')).length
       return true

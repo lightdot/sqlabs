@@ -104,7 +104,7 @@
       this.$el = $(this.el);
       this.el.content_id = this.el.id.replace('managed_html_content_block_', '');
       this.el.form_id = "managed_html_content_form_" + this.el.content_id;
-      if (0 < $(this.model.targetEl).closest('[contenteditable=true]').length) {
+      if (0 < $(this.model.get('targetEl')).closest('[contenteditable=true]').length) {
         _ref = ['back', 'commit', 'insert', 'html_editor'];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           name = _ref[_i];
@@ -160,30 +160,15 @@
         "_action": "back",
         "_managed_html": this.el.content_id
       }, this.el.id, function() {
-        var name, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3;
+        var hid, _ref;
         _this.model.set({
           'locked': false,
           'loading': false
         });
-        _ref = ['edit', 'html_editor', 'history'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _this.model.schema[name].disabled = false;
+        hid = (_ref = $(_this.model.get('targetEl'))) != null ? _ref.attr('hid') : void 0;
+        if ((hid != null) && $('[hid=' + hid + ']').length > 0) {
+          return smartEditor.resetTargetElement($('[hid=' + hid + ']')[0]);
         }
-        _ref2 = ['back', 'commit', 'insert', 'html_editor'];
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          name = _ref2[_j];
-          _this.model.schema[name].disabled = true;
-        }
-        if ($('.managed_html_content_anchor_pending', _this.el).length) {
-          _ref3 = ['publish'];
-          for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-            name = _ref3[_k];
-            _this.model.schema[name].disabled = false;
-          }
-        }
-        _this.model.trigger('updatedSchema');
-        return $('#' + _this.el.form_id).remove();
       });
       return this;
     };
@@ -274,33 +259,26 @@
         "_action": "edit",
         "_managed_html": this.el.content_id
       }, this.el.form_id, function() {
-        var name, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3;
+        var hid, name, _i, _len, _ref, _ref2;
         _this.model.set({
           'loading': false,
           'locked': false
         });
-        _ref = ['edit', 'html_editor', 'publish', 'history', 'edit'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _this.model.schema[name].disabled = true;
-        }
-        _ref2 = ['back', 'commit', 'insert', 'html_editor'];
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          name = _ref2[_j];
-          _this.model.schema[name].disabled = false;
-        }
-        _this.model.trigger('updatedSchema');
         $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
         if ($('#' + _this.el.form_id + " form textarea").attr('name') !== 'handlebars') {
-          _ref3 = ['insert', 'html_editor'];
-          for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-            name = _ref3[_k];
+          _ref = ['insert', 'html_editor'];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            name = _ref[_i];
             _this.model.schema[name].disabled = true;
           }
           _this.model.trigger('updatedSchema');
         }
         if (SmartEditorPlugins.edit_dialog[_this.$el.attr('content_type')]) {
-          return SmartEditorPlugins.edit_dialog[_this.$el.attr('content_type')](_this.model, _this);
+          SmartEditorPlugins.edit_dialog[_this.$el.attr('content_type')](_this.model, _this);
+        }
+        hid = (_ref2 = $(_this.model.get('targetEl'))) != null ? _ref2.attr('hid') : void 0;
+        if ((hid != null) && $('[hid=' + hid + ']').length > 0) {
+          return smartEditor.resetTargetElement($('[hid=' + hid + ']')[0]);
         }
       });
       return this;
@@ -313,7 +291,7 @@
         'loading': true,
         'locked': true
       });
-      baseEl = $(this.model.targetEl);
+      baseEl = $(this.model.get('targetEl'));
       if (baseEl.attr('hid') === void 0) {
         baseEl = baseEl.closest(".handlebars_content_block");
       }
@@ -397,7 +375,7 @@
         'loading': true,
         'locked': true
       });
-      baseEl = $(this.model.targetEl);
+      baseEl = $(this.model.get('targetEl'));
       if (baseEl.attr('hid') === void 0) {
         baseEl = baseEl.closest(".handlebars_content_block");
       }
@@ -428,7 +406,7 @@
 
     ManagedHTMLView.prototype["delete"] = function(obj) {
       var $data, baseEl, name, parent, _i, _len, _ref;
-      baseEl = $(this.model.targetEl);
+      baseEl = $(this.model.get('targetEl'));
       if (baseEl.attr('hid') === void 0) {
         baseEl = baseEl.closest(".handlebars_content_block");
       }
@@ -454,7 +432,7 @@
 
     ManagedHTMLView.prototype.move = function(obj) {
       var baseEl;
-      baseEl = $(this.model.targetEl);
+      baseEl = $(this.model.get('targetEl'));
       if (baseEl.attr('hid') === void 0) {
         baseEl = baseEl.closest(".handlebars_content_block");
       }
@@ -545,9 +523,10 @@
     var el, model, view;
     el = $(target_el).closest(".managed_html_content_block")[0];
     if (el != null) {
-      model = new ManagedHTMLModel();
+      model = new ManagedHTMLModel({
+        targetEl: target_el
+      });
       model.schema = SmartEditor.utils.clone(model.schema);
-      model.targetEl = target_el;
       view = new ManagedHTMLView({
         model: model,
         el: el,
