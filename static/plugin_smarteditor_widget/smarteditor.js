@@ -20,14 +20,7 @@ Exposed global class
 
     SmartEditor.widgets = {};
 
-    SmartEditor.widgetMapper = {
-      'Image': {
-        'DropdownForms': {
-          fields: ['src', 'width', 'height'],
-          title: '画像設定'
-        }
-      }
-    };
+    SmartEditor.widgetMapper = {};
 
     SmartEditor.factories = [];
 
@@ -88,6 +81,53 @@ Exposed global class
       },
       remove_document_write: function(val) {
         return val.replace(/document\.write\([^\)]*\)/, "");
+      },
+      resize: function($el) {
+        this.$el = $el;
+        return this.$el.find('img').each(function() {
+          var clicked, clicker, ratio, start_x, start_y;
+          clicked = false;
+          clicker = false;
+          start_x = 0;
+          start_y = 0;
+          ratio = $(this).width() / $(this).height();
+          $(this).hover(function() {
+            return $(this).css('cursor', 'nw-resize');
+          }, function() {
+            $(this).css('cursor', 'default');
+            return clicked = false;
+          });
+          $(this).mousedown(function(e) {
+            if (e.preventDefault) e.preventDefault();
+            clicked = true;
+            clicker = true;
+            start_x = Math.round(e.pageX - $(this).offset().left);
+            return start_y = Math.round(e.pageY - $(this).offset().top);
+          });
+          $(this).mouseup(function(e) {
+            return clicked = false;
+          });
+          $(this).click(function(e) {
+            if (clicker) return this.imageEdit(e);
+          });
+          return $(this).mousemove(function(e) {
+            var div_h, min_h, min_w, mouse_x, mouse_y, new_h, new_w;
+            if (clicked) {
+              min_w = 30;
+              min_h = 30;
+              clicker = false;
+              mouse_x = Math.round(e.pageX - $(this).offset().left) - start_x;
+              mouse_y = Math.round(e.pageY - $(this).offset().top) - start_y;
+              div_h = $(this).height();
+              new_h = parseInt(div_h) + mouse_y;
+              new_w = new_h * ratio;
+              if (new_w > min_w) $(this).width(new_w);
+              if (new_h > min_h) $(this).height(new_h);
+              start_x = Math.round(e.pageX - $(this).offset().left);
+              return start_y = Math.round(e.pageY - $(this).offset().top);
+            }
+          });
+        });
       }
     };
 

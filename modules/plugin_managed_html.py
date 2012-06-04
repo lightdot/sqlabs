@@ -419,15 +419,16 @@ class ManagedHTML(object):
                        'movie': MOVIE_EXTENSIONS,
                        'file': FILE_EXTENSIONS,
                        }.get(file_type)
+        from gluon.utils import web2py_uuid
         extracolumns = [
             {'label': '', 'width': '150px;',
                 'content':lambda row, rc:
                     SPAN(self.solidgrid.settings.recordbutton('ui-icon-seek-next', T('Select'),
                             '#', _onclick="""
-jQuery('img[src=dummy-image]').attr('src', jQuery(this).closest('tr').find('textarea').val());
+jQuery('img[src=dummy-image]').attr({'src':jQuery(this).closest('tr').find('textarea').val(), 'hid':'%s'});
 jQuery(document.body).trigger('managed_html_file_selected', ['%s', '%s']);
 jQuery('#managed_html_image_chooser').remove();
-                            """ % (row.name, row.thumbnail), _class='ui-btn', _file_id=row.id))},
+                            """ % (web2py_uuid(), row.name, row.thumbnail), _class='ui-btn', _file_id=row.id))},
              {'label': T('File'), 'width': '150px;',
               'content':lambda row, rc: DIV(
                 DIV(self._file_represent(row.name, row.thumbnail)),

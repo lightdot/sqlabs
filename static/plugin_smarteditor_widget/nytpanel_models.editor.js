@@ -4,11 +4,12 @@
 */
 
 (function() {
-  var EditableModel, EditableView, ImgModel, ImgView, LinkModel, LinkView,
+  var EditableModel, EditableView, ImgModel, ImgView, LinkModel, LinkView, resize_images,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    _this = this;
+    _this = this,
+    __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   EditableModel = (function(_super) {
     var n;
@@ -165,6 +166,8 @@
     画像に対する編集モデル
   */
 
+  resize_images = new Array();
+
   ImgModel = (function(_super) {
 
     __extends(ImgModel, _super);
@@ -175,24 +178,23 @@
 
     ImgModel.prototype.name = 'Image';
 
-    ImgModel.prototype.defaults = {
-      'src': void 0,
-      'width': void 0,
-      'height': void 0
-    };
+    ImgModel.prototype.defaults = {};
 
     ImgModel.prototype.schema = {
-      'src': {
-        type: 'Text',
-        title: '画像url'
+      'image_change': {
+        type: 'Action',
+        title: '画像変更',
+        disabled: false
       },
-      'width': {
-        type: 'Text',
-        title: '画像横幅'
+      'resize_start': {
+        type: 'Action',
+        title: '画像リサイズ開始',
+        disabled: true
       },
-      'height': {
-        type: 'Text',
-        title: '画像縦幅'
+      'resize_end': {
+        type: 'Action',
+        title: '画像リサイズ終了',
+        disabled: true
       }
     };
 
@@ -205,16 +207,16 @@
     __extends(ImgView, _super);
 
     function ImgView() {
-      this.src = __bind(this.src, this);
-      this.height = __bind(this.height, this);
-      this.width = __bind(this.width, this);
+      this.resize_end = __bind(this.resize_end, this);
+      this.resize_start = __bind(this.resize_start, this);
+      this.image_change = __bind(this.image_change, this);
       this.closeEdit = __bind(this.closeEdit, this);
       this.openEdit = __bind(this.openEdit, this);
       ImgView.__super__.constructor.apply(this, arguments);
     }
 
     ImgView.prototype.initialize = function() {
-      var key;
+      var key, _ref;
       ImgView.__super__.initialize.apply(this, arguments);
       for (key in this.model.schema) {
         if (this[key] != null) this.model.bind(key, this[key]);
@@ -229,36 +231,88 @@
         width: this.$el.width(),
         src: this.$el.attr('src')
       });
-      return this;
-    };
-
-    ImgView.prototype.openEdit = function() {
-      return this;
-    };
-
-    ImgView.prototype.closeEdit = function() {
-      return this;
-    };
-
-    ImgView.prototype.width = function() {
-      if (this.model.get('width') === '') {
-        return this.$el.css('width', 'auto');
+      if (_ref = this.$el.attr('hid'), __indexOf.call(resize_images, _ref) >= 0) {
+        this.model.schema['resize_start'].disabled = true;
+        return this.model.schema['resize_end'].disabled = false;
       } else {
-        return this.$el.css('width', this.model.get('width') + 'px');
+        this.model.schema['resize_start'].disabled = false;
+        return this.model.schema['resize_end'].disabled = true;
       }
     };
 
-    ImgView.prototype.height = function() {
-      if (this.model.get('height') === '') {
-        return this.$el.css('height', 'auto');
-      } else {
-        return this.$el.css('height', this.model.get('height') + 'px');
-      }
+    ImgView;
+
+    ImgView.prototype.openEdit = function() {};
+
+    ImgView;
+
+    ImgView.prototype.closeEdit = function() {};
+
+    ImgView;
+
+    ImgView.prototype.image_change = function() {
+      var src;
+      src = prompt('URL', this.$el.attr('src'));
+      if (src) return this.$el.attr('src', src);
     };
 
-    ImgView.prototype.src = function(obj) {
-      this.$el.attr('src', this.model.get('src'));
-      return this;
+    ImgView;
+
+    ImgView.prototype.resize_start = function() {
+      var clicked, clicker, ratio, start_x, start_y;
+      resize_images.push(this.$el.attr('hid'));
+      this.model.schema['resize_start'].disabled = true;
+      this.model.schema['resize_end'].disabled = false;
+      this.model.trigger('updatedSchema');
+      clicked = false;
+      clicker = false;
+      start_x = 0;
+      start_y = 0;
+      ratio = this.$el.width() / this.$el.height();
+      this.$el.hover(function() {
+        return $(this).css('cursor', 'nw-resize');
+      }, function() {
+        $(this).css('cursor', 'default');
+        return clicked = false;
+      });
+      this.$el.mousedown(function(e) {
+        if (e.preventDefault) e.preventDefault();
+        clicked = true;
+        clicker = true;
+        start_x = Math.round(e.pageX - $(this).offset().left);
+        return start_y = Math.round(e.pageY - $(this).offset().top);
+      });
+      this.$el.mouseup(function(e) {
+        return clicked = false;
+      });
+      return this.$el.mousemove(function(e) {
+        var div_h, min_h, min_w, mouse_x, mouse_y, new_h, new_w;
+        if (clicked) {
+          min_w = 50;
+          min_h = 50;
+          clicker = false;
+          mouse_x = Math.round(e.pageX - $(this).offset().left) - start_x;
+          mouse_y = Math.round(e.pageY - $(this).offset().top) - start_y;
+          div_h = $(this).height();
+          new_h = parseInt(div_h) + mouse_y;
+          new_w = new_h * ratio;
+          if (new_w > min_w) $(this).width(new_w);
+          if (new_h > min_h) $(this).height(new_h);
+          start_x = Math.round(e.pageX - $(this).offset().left);
+          return start_y = Math.round(e.pageY - $(this).offset().top);
+        }
+      });
+    };
+
+    ImgView.prototype.resize_end = function() {
+      resize_images.pop(this.$el.attr('hid'));
+      this.model.schema['resize_start'].disabled = false;
+      this.model.schema['resize_end'].disabled = true;
+      this.model.trigger('updatedSchema');
+      this.$el.unbind('hover');
+      this.$el.unbind('mousedown');
+      this.$el.unbind('mouseup');
+      return this.$el.unbind('mousemove');
     };
 
     return ImgView;

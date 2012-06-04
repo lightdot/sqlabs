@@ -13,11 +13,11 @@ class @SmartEditor
   @VERSION: '0.1.0'
 
   @widgets: {}
-  @widgetMapper:
-    'Image':
-      'DropdownForms':
-        fields: ['src','width','height']
-        title:'画像設定'
+  @widgetMapper: {}
+#    'Image':
+#      'DropdownForms':
+#        fields: ['src','width','height']
+#        title:'画像設定'
 
   @factories: []
 
@@ -70,6 +70,53 @@ class @SmartEditor
     
     remove_document_write: (val) ->
       return val.replace(/document\.write\([^\)]*\)/,"")
+
+    resize: (@$el) ->
+      
+      @$el.find('img').each ->
+      
+        clicked = false
+        clicker = false
+        start_x = 0
+        start_y = 0
+        ratio = $(this).width()/$(this).height()
+
+        $(this).hover( 
+          -> $(this).css('cursor', 'nw-resize'),
+          -> $(this).css('cursor','default');clicked=false
+        )
+
+        $(this).mousedown (e) ->
+          if e.preventDefault 
+            e.preventDefault()
+          clicked = true
+          clicker = true
+          start_x = Math.round(e.pageX - $(this).offset().left)
+          start_y = Math.round(e.pageY - $(this).offset().top)
+    
+        $(this).mouseup (e) ->
+          clicked = false
+    
+        $(this).click (e) ->
+          if clicker
+            this.imageEdit(e)
+
+        $(this).mousemove (e) ->
+          if clicked
+            min_w = 30
+            min_h = 30
+            clicker = false
+            mouse_x = Math.round(e.pageX - $(this).offset().left) - start_x
+            mouse_y = Math.round(e.pageY - $(this).offset().top) - start_y
+            div_h = $(this).height()
+            new_h = parseInt(div_h)+mouse_y
+            new_w = new_h*ratio
+            if new_w > min_w
+              $(this).width(new_w)
+            if new_h > min_h
+              $(this).height(new_h)
+            start_x = Math.round(e.pageX - $(this).offset().left)
+            start_y = Math.round(e.pageY - $(this).offset().top)
       
   # === instance variables ===
   mainPanelModel: undefined

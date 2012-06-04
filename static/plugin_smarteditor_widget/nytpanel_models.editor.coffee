@@ -76,16 +76,14 @@ SmartEditor.factories.push (target_el) =>
 ###
   画像に対する編集モデル
 ###
+resize_images = new Array()
 class ImgModel extends SmartEditor.ElementModel
   name: 'Image'
-  defaults:
-    'src': undefined
-    'width': undefined
-    'height': undefined
-  schema:
-    'src': {type: 'Text', title:'画像url'}
-    'width': {type: 'Text', title:'画像横幅'}
-    'height': {type: 'Text', title:'画像縦幅'}
+  defaults:{}
+  schema: 
+    'image_change': {type: 'Action', title:'画像変更',disabled:false}
+    'resize_start': {type: 'Action', title:'画像リサイズ開始',disabled:true}
+    'resize_end': {type: 'Action', title:'画像リサイズ終了',disabled:true}
 
 class ImgView extends SmartEditor.ElementView
   initialize: ->
@@ -96,29 +94,83 @@ class ImgView extends SmartEditor.ElementView
     @model.bind("closeEdit", @closeEdit)
     @$el = $(@el)
     @model.set({width: @$el.width(), src: @$el.attr('src')})
-    @ 
+    if @$el.attr('hid') in resize_images
+      @model.schema['resize_start'].disabled = true
+      @model.schema['resize_end'].disabled = false
+    else
+      @model.schema['resize_start'].disabled = false
+      @model.schema['resize_end'].disabled = true
+
+  @ 
 
   openEdit: =>
-    @
+  @
 
   closeEdit: =>
-    @
+  @
+  
+  image_change: =>
+    src = prompt('URL',@$el.attr('src'))
+    if src
+      @$el.attr('src', src)
+  @
+  
+  resize_start: =>
+    
+    resize_images.push(@$el.attr('hid'))
+    @model.schema['resize_start'].disabled = true
+    @model.schema['resize_end'].disabled = false
+    @model.trigger 'updatedSchema'
 
-  width: =>
-    if @model.get('width') is ''
-      @$el.css('width', 'auto')
-    else
-      @$el.css('width', @model.get('width')+'px')
+    clicked = false
+    clicker = false
+    start_x = 0
+    start_y = 0
+    ratio = @$el.width()/@$el.height()
 
-  height: =>
-    if @model.get('height') is ''
-      @$el.css('height', 'auto')
-    else
-      @$el.css('height', @model.get('height')+'px')
+    @$el.hover( 
+      -> $(this).css('cursor', 'nw-resize'),
+      -> $(this).css('cursor','default');clicked=false
+    )
 
-  src: (obj) =>
-    @$el.attr('src', @model.get('src'))
-    @
+    @$el.mousedown (e) ->
+      if e.preventDefault 
+        e.preventDefault()
+      clicked = true
+      clicker = true
+      start_x = Math.round(e.pageX - $(this).offset().left)
+      start_y = Math.round(e.pageY - $(this).offset().top)
+    
+    @$el.mouseup (e) ->
+      clicked = false
+    
+    @$el.mousemove (e) ->
+      if clicked
+        min_w = 50
+        min_h = 50
+        clicker = false
+        mouse_x = Math.round(e.pageX - $(this).offset().left) - start_x
+        mouse_y = Math.round(e.pageY - $(this).offset().top) - start_y
+        div_h = $(this).height()
+        new_h = parseInt(div_h)+mouse_y
+        new_w = new_h*ratio
+        if new_w > min_w
+          $(this).width(new_w)
+        if new_h > min_h
+          $(this).height(new_h)
+        start_x = Math.round(e.pageX - $(this).offset().left)
+        start_y = Math.round(e.pageY - $(this).offset().top)
+  
+  resize_end: =>
+    
+    resize_images.pop(@$el.attr('hid'))
+    @model.schema['resize_start'].disabled = false
+    @model.schema['resize_end'].disabled = true
+    @model.trigger 'updatedSchema'
+    @$el.unbind('hover')
+    @$el.unbind('mousedown')
+    @$el.unbind('mouseup')
+    @$el.unbind('mousemove')
 
 SmartEditor.factories.push (target_el) =>
   el = $(target_el).closest("[contenteditable=true]")[0]
