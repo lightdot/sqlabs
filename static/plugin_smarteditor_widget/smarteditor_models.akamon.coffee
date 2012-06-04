@@ -12,7 +12,7 @@ class ManagedHTMLModel extends SmartEditor.ElementModel
     'edit': {type: 'Action', title:'編集', disabled:true}
     'html_editor': {type: 'Action', title:'HTML', disabled:true}
     'insert': {type: 'Action', title:'新規', disabled:true}
-    'move': {type: 'Action', title:'移動', disabled:true}
+    #'move': {type: 'Action', title:'移動', disabled:true}
     'delete': {type: 'Action', title:'削除', disabled:true}
     'publish': {type: 'Action', title:'公開', disabled:true}
     'history': {type: 'Action', title:'履歴', disabled:true}

@@ -46,11 +46,6 @@
         title: '新規',
         disabled: true
       },
-      'move': {
-        type: 'Action',
-        title: '移動',
-        disabled: true
-      },
       'delete': {
         type: 'Action',
         title: '削除',
