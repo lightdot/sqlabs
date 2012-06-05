@@ -62,16 +62,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'locked': false
         'loading': false
-#      @model.schema[name].disabled = false for name in ['edit', 'html_editor', 'history']
-#      @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
-#      if $('.managed_html_content_anchor_pending',@el).length
-#        @model.schema[name].disabled = false for name in ['publish']
-#      @model.trigger 'updatedSchema'
-#      $('#'+@el.form_id).remove()
-
-      hid = $(@model.get('targetEl'))?.attr('hid')
-      if hid? and $('[hid='+hid+']').length>0
-        smartEditor.resetTargetElement($('[hid='+hid+']')[0])
+      smartEditor.resetTargetElement(@el)
     @
 
   commit: (obj) =>
@@ -116,9 +107,8 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-      @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
-      @model.schema[name].disabled = false for name in ['edit', 'history', 'publish']
-      @model.trigger 'updatedSchema'
+      smartEditor.resetTargetElement(@el)
+
       @$el.addClass('managed_html_content_block_pending')
       $('#'+@el.form_id).remove()
     @
@@ -150,10 +140,10 @@ class ManagedHTMLView extends SmartEditor.ElementView
         SmartEditorPlugins.edit_dialog[@$el.attr('content_type')](@model, this)
 
       hid = $(@model.get('targetEl'))?.attr('hid')
-      if hid? and $('[hid='+hid+']').length>0
-        smartEditor.resetTargetElement($('[hid='+hid+']')[0])
-
-
+      if hid?
+        for elm in $('[hid='+hid+']')
+          if $(elm).closest('.managed_html_content_block')[0]==@el
+            smartEditor.resetTargetElement(elm)
     @
   
   html_editor: =>

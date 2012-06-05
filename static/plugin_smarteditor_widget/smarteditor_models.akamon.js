@@ -160,15 +160,11 @@
         "_action": "back",
         "_managed_html": this.el.content_id
       }, this.el.id, function() {
-        var hid, _ref;
         _this.model.set({
           'locked': false,
           'loading': false
         });
-        hid = (_ref = $(_this.model.get('targetEl'))) != null ? _ref.attr('hid') : void 0;
-        if ((hid != null) && $('[hid=' + hid + ']').length > 0) {
-          return smartEditor.resetTargetElement($('[hid=' + hid + ']')[0]);
-        }
+        return smartEditor.resetTargetElement(_this.el);
       });
       return this;
     };
@@ -221,22 +217,11 @@
         return postData[$(this).attr('name')] = $(this).val();
       });
       managed_html_ajax_page(document.location, postData, this.el.id, function() {
-        var name, _i, _j, _len, _len2, _ref, _ref2;
         _this.model.set({
           'loading': false,
           'locked': false
         });
-        _ref = ['back', 'commit', 'insert', 'html_editor'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _this.model.schema[name].disabled = true;
-        }
-        _ref2 = ['edit', 'history', 'publish'];
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          name = _ref2[_j];
-          _this.model.schema[name].disabled = false;
-        }
-        _this.model.trigger('updatedSchema');
+        smartEditor.resetTargetElement(_this.el);
         _this.$el.addClass('managed_html_content_block_pending');
         return $('#' + _this.el.form_id).remove();
       });
@@ -259,7 +244,7 @@
         "_action": "edit",
         "_managed_html": this.el.content_id
       }, this.el.form_id, function() {
-        var hid, name, _i, _len, _ref, _ref2;
+        var elm, hid, name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _results;
         _this.model.set({
           'loading': false,
           'locked': false
@@ -277,8 +262,18 @@
           SmartEditorPlugins.edit_dialog[_this.$el.attr('content_type')](_this.model, _this);
         }
         hid = (_ref2 = $(_this.model.get('targetEl'))) != null ? _ref2.attr('hid') : void 0;
-        if ((hid != null) && $('[hid=' + hid + ']').length > 0) {
-          return smartEditor.resetTargetElement($('[hid=' + hid + ']')[0]);
+        if (hid != null) {
+          _ref3 = $('[hid=' + hid + ']');
+          _results = [];
+          for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
+            elm = _ref3[_j];
+            if ($(elm).closest('.managed_html_content_block')[0] === _this.el) {
+              _results.push(smartEditor.resetTargetElement(elm));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
         }
       });
       return this;
