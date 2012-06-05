@@ -132,21 +132,15 @@ class @SmartEditor
     $(@rootElement).on 'mousedown', @onClick
     @
 
-  _tunePos: (pos) =>
-    $el = @mainPanelView.$el
-    viewWidth = $(window).width()
-    pos.x = viewWidth - ($el.width() + 20)  if pos.x + $el.width() + 20 > viewWidth
-    pos.x = 0  if pos.x < 0
-    pos.y = pos.y - 70
-    pos.y = 0  if pos.y < 0
-
-  resetTargetElement: (elm) =>
+  # 編集対象を設定する
+  setTargetElement: (elm) =>
     if $(elm).closest(SmartEditor.disableSelectors.join(',')).length
       return true
     if not @mainPanelModel.get('targetLocked')
       targetModels = @findElementModels(elm)
       @mainPanelModel.set targetModels: targetModels
 
+  # クリックイベントによって編集対象を設定する
   onClick: (e) =>
     if $(e.target).closest(SmartEditor.disableSelectors.join(',')).length
       return true
@@ -161,7 +155,14 @@ class @SmartEditor
         x: e.pageX - 50
         y: e.pageY - 50
       }
-      @_tunePos(pos)
+
+      $el = @mainPanelView.$el
+      viewWidth = $(window).width()
+      pos.x = viewWidth - ($el.width() + 20)  if pos.x + $el.width() + 20 > viewWidth
+      pos.x = 0  if pos.x < 0
+      pos.y = pos.y - 70
+      pos.y = 0  if pos.y < 0
+
       @mainPanelModel.set position: pos
     @
 
@@ -182,7 +183,6 @@ Main floating panel of the editor
 ###
 class SmartEditor.MainPanelModel extends Backbone.Model
   defaults:
-    formExpanded: false
     targetLocked: false       #編集対象にロックされたものがある
     targetEl: undefined	#編集対象としてクリックされた要素
     targetModels: []		#編集対象が持つモデル(将来的には複数)
@@ -194,6 +194,9 @@ class SmartEditor.MainPanelModel extends Backbone.Model
 class SmartEditor.MainPanelView extends Backbone.View
   tagName: "div"
   className: "smarteditor-main-panel"
+
+  $buttonsEl: undefined,
+  $subButtonsEl: undefined,
 
   initialize: ->
     @$el = $(@el)
@@ -208,23 +211,22 @@ class SmartEditor.MainPanelView extends Backbone.View
     @$el.append @$buttonsEl
     @$subButtonsEl = $("<ul class=\"subbuttons\"></ul>")
     @$el.append @$subButtonsEl
-    @$el.append $("<fieldset class=\"bbf-form\"></fieldset>")
 
     @model.bind "change:position", @changePosition
-    @model.bind "change:formExpanded", @changeFormExpanded
     @model.bind "change:targetModels", @changeTargetModels
     @model.bind "change:visibility", @changeVisibility
     @
 
   events: 
     "click a.ui-btn-closePanel": "closePanel"
-    "click a.ui-btn-expandPanel": "expandPanel"
-    #"mousedown.smarteditor-main-panel": "dragPanel"
-    #"mouseup.smarteditor-main-panel": "dropPanel"
+    "mousedown.smarteditor-main-panel": "dragPanel"
 
   dragPanel: (e) =>
     @model.set draging: {x:e.pageX, y:e.pageY}
+    $(document.body).off('mousemove', @movePanel)
+    $(document.body).off('mouseup', @dropPanel)
     $(document.body).on('mousemove', @movePanel)
+    $(document.body).on('mouseup', @dropPanel)
     e.preventDefault()
 
   movePanel: (e) =>
@@ -233,11 +235,14 @@ class SmartEditor.MainPanelView extends Backbone.View
     newpos = 
       x: pos.x + (e.pageX - prev_pos.x)
       y: pos.y + (e.pageY - prev_pos.y)
-    @model.set draging: {x:e.pageX, y:e.pageY, animate:false}
+      animate:false
+
+    @model.set draging: {x:e.pageX, y:e.pageY}
     @model.set position: newpos
 
   dropPanel: (e) =>
     $(document.body).off('mousemove', @movePanel)
+    $(document.body).off('mouseup', @dropPanel)
     prev_pos = @model.get 'draging'
     pos = @model.get("position")
 
@@ -257,15 +262,15 @@ class SmartEditor.MainPanelView extends Backbone.View
   changePosition: =>
     pos = @model.get("position")
     if @model.get('visibility')
-      if not pos.animate? or not pos.animate
+      if not pos.animate? or pos.animate
         @$el.animate
           top: pos.y
           left: pos.x
           ,
           queue: false
       else
-        @$el.style.top = pos.y
-        @$el.style.left = pos.x
+        @$el.css('top', pos.y);
+        @$el.css('left', pos.x);
     @
 
   createWidget: (name, schemaObj, elModel) ->
@@ -278,11 +283,11 @@ class SmartEditor.MainPanelView extends Backbone.View
       return v.$el
     return undefined
 
-  changeButtons: =>
+  changeSchemas: =>
     editorModel = @model
     targetModels = editorModel.get("targetModels")
     @$buttonsEl.empty()
-    f = false
+    hasModel = false
     for targetModel in targetModels
       if SmartEditor.widgetMapper[targetModel.name]?
         for widget, schema of SmartEditor.widgetMapper[targetModel.name]
@@ -291,12 +296,10 @@ class SmartEditor.MainPanelView extends Backbone.View
             m = new widgets[widget].M({elModel:targetModel, schema:schema})
             w = new widgets[widget].V({model:m})
             @$buttonsEl.append w.el
-            f=true
+            hasModel=true
       else
-        ((@$buttonsEl.append @createWidget(name, obj, targetModel); f=true) if not obj.disabled) for name,obj of targetModel.schema
-    @model.set { 'visibility': f }
-    #@model.set formExpanded: false  if target? and prevEl? and not $(prevEl).closest(target).length
-    # @changeFormExpanded()
+        ((@$buttonsEl.append @createWidget(name, obj, targetModel); hasModel=true) if not obj.disabled) for name,obj of targetModel.schema
+    @model.set {'visibility': hasModel}
     @
 
   changeTargetLocked: =>
@@ -311,55 +314,17 @@ class SmartEditor.MainPanelView extends Backbone.View
   changeTargetModels: =>
     editorModel = @model
     for targetModel in editorModel.previous("targetModels")
-      targetModel.unbind('updatedSchema', @changeButtons)
+      targetModel.unbind('updatedSchema', @changeSchemas)
       targetModel.unbind('change:locked', @changeTargetLocked)
       targetModel.trigger "closeEdit"
     targetModels = editorModel.get("targetModels")
-    @changeButtons()
+    @changeSchemas()
     for m in targetModels
       m.trigger 'openEdit'
       m.bind('change:locked', @changeTargetLocked)
-      m.bind('updatedSchema', @changeButtons)
+      m.bind('updatedSchema', @changeSchemas)
 
-    @updateForm()
     @
-
-  changeFormExpanded: (editorModel) =>
-    anim = "fast"
-    anim = `undefined`  unless editorModel
-    model = @model.get("targetModels")[0]
-    f = @model.get("formExpanded")
-    if f and model
-      @updateForm()
-      $(".bbf-form", @el).show anim
-      #$(model.el).attr "contenteditable", false
-    else if model
-      $(".bbf-form", @el).hide anim
-      #$(model.el).attr "contenteditable", true
-    pos = @model.get("position")
-    pos
-
-  updateForm: () =>
-    return 
-
-    $(".smarteditor-main-panel .bbf-form").empty()
-    for targetModel in @model.get("targetModels")
-      targetModel.trigger "updateValue"
-      fields = []
-      ((fields.push k if v.type in ['Text','Select']) for k,v of targetModel.schema)
-      form = new Backbone.Form(
-        model: targetModel
-        fields: fields
-        idPrefix: "smarteditor_editor_form_"
-      )
-      form_el = form.render().el
-      $form_el = $(form_el)
-      $form_el.on "change", ->
-        form.commit()
-
-      form_el.style.display = "None"  unless @model.get("formExpanded")
-      $(".smarteditor-main-panel .bbf-form").replaceWith form_el
-
 
   closePanel: =>
     if @model.get("targetLocked")
@@ -371,23 +336,9 @@ class SmartEditor.MainPanelView extends Backbone.View
     @model.set
       targetModels: []
       targetEl: undefined
-      formExpanded: false
     @
 
-  expandPanel: (e) =>
-    e.preventDefault()
-    @toggleForm()
 
-  toggleForm: (e) =>
-    @model.set formExpanded: not @model.get("formExpanded")
-    @
-
-  ###
-  upLayer: ->
-    el = @model.get("targetEl")
-    $(el.parentNode).trigger "mousedown"
-    @
-  ###
 
 class SmartEditor.ElementModel extends Backbone.Model
   defaults:

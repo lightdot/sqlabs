@@ -164,7 +164,7 @@
           'locked': false,
           'loading': false
         });
-        return smartEditor.resetTargetElement(_this.el);
+        return smartEditor.setTargetElement(_this.el);
       });
       return this;
     };
@@ -221,7 +221,7 @@
           'loading': false,
           'locked': false
         });
-        smartEditor.resetTargetElement(_this.el);
+        smartEditor.setTargetElement(_this.el);
         _this.$el.addClass('managed_html_content_block_pending');
         return $('#' + _this.el.form_id).remove();
       });
@@ -269,7 +269,7 @@
             elm = _ref3[_j];
             closest = $(elm).closest('.managed_html_content_block');
             if (closest.length > 0 && closest[0] === _this.el) {
-              _results.push(smartEditor.resetTargetElement(elm));
+              _results.push(smartEditor.setTargetElement(elm));
             } else {
               _results.push(void 0);
             }

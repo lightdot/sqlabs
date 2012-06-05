@@ -139,8 +139,7 @@ Exposed global class
 
     function SmartEditor() {
       this.onClick = __bind(this.onClick, this);
-      this.resetTargetElement = __bind(this.resetTargetElement, this);
-      this._tunePos = __bind(this._tunePos, this);      this.mainPanelModel = new SmartEditor.MainPanelModel();
+      this.setTargetElement = __bind(this.setTargetElement, this);      this.mainPanelModel = new SmartEditor.MainPanelModel();
       this.mainPanelView = new SmartEditor.MainPanelView({
         model: this.mainPanelModel
       });
@@ -150,19 +149,7 @@ Exposed global class
       this;
     }
 
-    SmartEditor.prototype._tunePos = function(pos) {
-      var $el, viewWidth;
-      $el = this.mainPanelView.$el;
-      viewWidth = $(window).width();
-      if (pos.x + $el.width() + 20 > viewWidth) {
-        pos.x = viewWidth - ($el.width() + 20);
-      }
-      if (pos.x < 0) pos.x = 0;
-      pos.y = pos.y - 70;
-      if (pos.y < 0) return pos.y = 0;
-    };
-
-    SmartEditor.prototype.resetTargetElement = function(elm) {
+    SmartEditor.prototype.setTargetElement = function(elm) {
       var targetModels;
       if ($(elm).closest(SmartEditor.disableSelectors.join(',')).length) {
         return true;
@@ -176,7 +163,7 @@ Exposed global class
     };
 
     SmartEditor.prototype.onClick = function(e) {
-      var pos, targetModels;
+      var $el, pos, targetModels, viewWidth;
       if ($(e.target).closest(SmartEditor.disableSelectors.join(',')).length) {
         return true;
       }
@@ -190,7 +177,14 @@ Exposed global class
           x: e.pageX - 50,
           y: e.pageY - 50
         };
-        this._tunePos(pos);
+        $el = this.mainPanelView.$el;
+        viewWidth = $(window).width();
+        if (pos.x + $el.width() + 20 > viewWidth) {
+          pos.x = viewWidth - ($el.width() + 20);
+        }
+        if (pos.x < 0) pos.x = 0;
+        pos.y = pos.y - 70;
+        if (pos.y < 0) pos.y = 0;
         this.mainPanelModel.set({
           position: pos
         });
@@ -232,7 +226,6 @@ Exposed global class
     }
 
     MainPanelModel.prototype.defaults = {
-      formExpanded: false,
       targetLocked: false,
       targetEl: void 0,
       targetModels: [],
@@ -252,14 +245,10 @@ Exposed global class
     __extends(MainPanelView, _super);
 
     function MainPanelView() {
-      this.toggleForm = __bind(this.toggleForm, this);
-      this.expandPanel = __bind(this.expandPanel, this);
       this.closePanel = __bind(this.closePanel, this);
-      this.updateForm = __bind(this.updateForm, this);
-      this.changeFormExpanded = __bind(this.changeFormExpanded, this);
       this.changeTargetModels = __bind(this.changeTargetModels, this);
       this.changeTargetLocked = __bind(this.changeTargetLocked, this);
-      this.changeButtons = __bind(this.changeButtons, this);
+      this.changeSchemas = __bind(this.changeSchemas, this);
       this.changePosition = __bind(this.changePosition, this);
       this.changeVisibility = __bind(this.changeVisibility, this);
       this.dropPanel = __bind(this.dropPanel, this);
@@ -271,6 +260,10 @@ Exposed global class
     MainPanelView.prototype.tagName = "div";
 
     MainPanelView.prototype.className = "smarteditor-main-panel";
+
+    MainPanelView.prototype.$buttonsEl = void 0;
+
+    MainPanelView.prototype.$subButtonsEl = void 0;
 
     MainPanelView.prototype.initialize = function() {
       var $closeBtn, v;
@@ -291,9 +284,7 @@ Exposed global class
       this.$el.append(this.$buttonsEl);
       this.$subButtonsEl = $("<ul class=\"subbuttons\"></ul>");
       this.$el.append(this.$subButtonsEl);
-      this.$el.append($("<fieldset class=\"bbf-form\"></fieldset>"));
       this.model.bind("change:position", this.changePosition);
-      this.model.bind("change:formExpanded", this.changeFormExpanded);
       this.model.bind("change:targetModels", this.changeTargetModels);
       this.model.bind("change:visibility", this.changeVisibility);
       return this;
@@ -301,7 +292,7 @@ Exposed global class
 
     MainPanelView.prototype.events = {
       "click a.ui-btn-closePanel": "closePanel",
-      "click a.ui-btn-expandPanel": "expandPanel"
+      "mousedown.smarteditor-main-panel": "dragPanel"
     };
 
     MainPanelView.prototype.dragPanel = function(e) {
@@ -311,7 +302,10 @@ Exposed global class
           y: e.pageY
         }
       });
+      $(document.body).off('mousemove', this.movePanel);
+      $(document.body).off('mouseup', this.dropPanel);
       $(document.body).on('mousemove', this.movePanel);
+      $(document.body).on('mouseup', this.dropPanel);
       return e.preventDefault();
     };
 
@@ -321,13 +315,13 @@ Exposed global class
       pos = this.model.get("position");
       newpos = {
         x: pos.x + (e.pageX - prev_pos.x),
-        y: pos.y + (e.pageY - prev_pos.y)
+        y: pos.y + (e.pageY - prev_pos.y),
+        animate: false
       };
       this.model.set({
         draging: {
           x: e.pageX,
-          y: e.pageY,
-          animate: false
+          y: e.pageY
         }
       });
       return this.model.set({
@@ -338,6 +332,7 @@ Exposed global class
     MainPanelView.prototype.dropPanel = function(e) {
       var newpos, pos, prev_pos;
       $(document.body).off('mousemove', this.movePanel);
+      $(document.body).off('mouseup', this.dropPanel);
       prev_pos = this.model.get('draging');
       pos = this.model.get("position");
       newpos = {
@@ -365,15 +360,15 @@ Exposed global class
       var pos;
       pos = this.model.get("position");
       if (this.model.get('visibility')) {
-        if (!(pos.animate != null) || !pos.animate) {
+        if (!(pos.animate != null) || pos.animate) {
           this.$el.animate({
             top: pos.y,
             left: pos.x,
             queue: false
           });
         } else {
-          this.$el.style.top = pos.y;
-          this.$el.style.left = pos.x;
+          this.$el.css('top', pos.y);
+          this.$el.css('left', pos.x);
         }
       }
       return this;
@@ -404,12 +399,12 @@ Exposed global class
       }
     };
 
-    MainPanelView.prototype.changeButtons = function() {
-      var editorModel, f, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _len, _ref, _ref2;
+    MainPanelView.prototype.changeSchemas = function() {
+      var editorModel, hasModel, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _len, _ref, _ref2;
       editorModel = this.model;
       targetModels = editorModel.get("targetModels");
       this.$buttonsEl.empty();
-      f = false;
+      hasModel = false;
       for (_i = 0, _len = targetModels.length; _i < _len; _i++) {
         targetModel = targetModels[_i];
         if (SmartEditor.widgetMapper[targetModel.name] != null) {
@@ -426,7 +421,7 @@ Exposed global class
                 model: m
               });
               this.$buttonsEl.append(w.el);
-              f = true;
+              hasModel = true;
             }
           }
         } else {
@@ -435,13 +430,13 @@ Exposed global class
             obj = _ref2[name];
             if (!obj.disabled) {
               this.$buttonsEl.append(this.createWidget(name, obj, targetModel));
-              f = true;
+              hasModel = true;
             }
           }
         }
       }
       this.model.set({
-        'visibility': f
+        'visibility': hasModel
       });
       return this;
     };
@@ -468,67 +463,19 @@ Exposed global class
       _ref = editorModel.previous("targetModels");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         targetModel = _ref[_i];
-        targetModel.unbind('updatedSchema', this.changeButtons);
+        targetModel.unbind('updatedSchema', this.changeSchemas);
         targetModel.unbind('change:locked', this.changeTargetLocked);
         targetModel.trigger("closeEdit");
       }
       targetModels = editorModel.get("targetModels");
-      this.changeButtons();
+      this.changeSchemas();
       for (_j = 0, _len2 = targetModels.length; _j < _len2; _j++) {
         m = targetModels[_j];
         m.trigger('openEdit');
         m.bind('change:locked', this.changeTargetLocked);
-        m.bind('updatedSchema', this.changeButtons);
+        m.bind('updatedSchema', this.changeSchemas);
       }
-      this.updateForm();
       return this;
-    };
-
-    MainPanelView.prototype.changeFormExpanded = function(editorModel) {
-      var anim, f, model, pos;
-      anim = "fast";
-      if (!editorModel) anim = undefined;
-      model = this.model.get("targetModels")[0];
-      f = this.model.get("formExpanded");
-      if (f && model) {
-        this.updateForm();
-        $(".bbf-form", this.el).show(anim);
-      } else if (model) {
-        $(".bbf-form", this.el).hide(anim);
-      }
-      pos = this.model.get("position");
-      return pos;
-    };
-
-    MainPanelView.prototype.updateForm = function() {
-      var $form_el, fields, form, form_el, k, targetModel, v, _i, _len, _ref, _ref2, _ref3, _results;
-      return;
-      $(".smarteditor-main-panel .bbf-form").empty();
-      _ref = this.model.get("targetModels");
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        targetModel = _ref[_i];
-        targetModel.trigger("updateValue");
-        fields = [];
-        _ref2 = targetModel.schema;
-        for (k in _ref2) {
-          v = _ref2[k];
-          if ((_ref3 = v.type) === 'Text' || _ref3 === 'Select') fields.push(k);
-        }
-        form = new Backbone.Form({
-          model: targetModel,
-          fields: fields,
-          idPrefix: "smarteditor_editor_form_"
-        });
-        form_el = form.render().el;
-        $form_el = $(form_el);
-        $form_el.on("change", function() {
-          return form.commit();
-        });
-        if (!this.model.get("formExpanded")) form_el.style.display = "None";
-        _results.push($(".smarteditor-main-panel .bbf-form").replaceWith(form_el));
-      }
-      return _results;
     };
 
     MainPanelView.prototype.closePanel = function() {
@@ -542,30 +489,10 @@ Exposed global class
       }
       this.model.set({
         targetModels: [],
-        targetEl: void 0,
-        formExpanded: false
+        targetEl: void 0
       });
       return this;
     };
-
-    MainPanelView.prototype.expandPanel = function(e) {
-      e.preventDefault();
-      return this.toggleForm();
-    };
-
-    MainPanelView.prototype.toggleForm = function(e) {
-      this.model.set({
-        formExpanded: !this.model.get("formExpanded")
-      });
-      return this;
-    };
-
-    /*
-      upLayer: ->
-        el = @model.get("targetEl")
-        $(el.parentNode).trigger "mousedown"
-        @
-    */
 
     return MainPanelView;
 

@@ -28,13 +28,13 @@ if(range.startContainer.nodeType == Node.TEXT_NODE){
 		range.selectNode(newspan);
 	}
 	else{
-      	var newone = range.startContainer.splitText(range.startOffset);
-	var newspan = document.createElement('span');
-	var range2 = document.createRange();
-	range2.selectNode(newone);
-	range2.surroundContents(newspan);
-	range2.detach();
-	range.setStartBefore(newspan);
+	      	var newone = range.startContainer.splitText(range.startOffset);
+		var newspan = document.createElement('span');
+		var range2 = document.createRange();
+		range2.selectNode(newone);
+		range2.surroundContents(newspan);
+		range2.detach();
+		range.setStartBefore(newspan);
 	}
 }
 

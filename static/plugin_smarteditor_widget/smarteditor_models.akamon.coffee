@@ -62,7 +62,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'locked': false
         'loading': false
-      smartEditor.resetTargetElement(@el)
+      smartEditor.setTargetElement(@el)
     @
 
   commit: (obj) =>
@@ -107,7 +107,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-      smartEditor.resetTargetElement(@el)
+      smartEditor.setTargetElement(@el)
 
       @$el.addClass('managed_html_content_block_pending')
       $('#'+@el.form_id).remove()
@@ -144,7 +144,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
         for elm in $('[hid='+hid+']')
           closest = $(elm).closest('.managed_html_content_block')
           if closest.length>0 && closest[0]==@el
-            smartEditor.resetTargetElement(elm)
+            smartEditor.setTargetElement(elm)
     @
   
   html_editor: =>
