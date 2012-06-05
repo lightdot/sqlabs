@@ -142,7 +142,8 @@ class ManagedHTMLView extends SmartEditor.ElementView
       hid = $(@model.get('targetEl'))?.attr('hid')
       if hid?
         for elm in $('[hid='+hid+']')
-          if $(elm).closest('.managed_html_content_block')[0]==@el
+          closest = $(elm).closest('.managed_html_content_block')
+          if closest.length>0 && closest[0]==@el
             smartEditor.resetTargetElement(elm)
     @
   

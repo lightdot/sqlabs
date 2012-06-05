@@ -1,39 +1,53 @@
+
+
 var _change = function(_style,___change){
 var selection = getSelection();
 var range = selection.getRangeAt(0);
 
 if(range.startContainer.nodeType == Node.TEXT_NODE){
 	if(range.endContainer == range.startContainer){
+
+//		分割直後に要素をいれても、範囲指定内とはみなされない。
+//        var second = range.endContainer.splitText(range.endOffset);
+//	var first = range.endContainer;
+//        var newspan = $('<span>'+first.nodeValue.slice(range.startOffset)+'</span>')[0];
+//        first.parentNode.insertBefore(newspan, second);
+//		$(textnode).insertAfter('<span>test</span>');
+//		var parent = range.startContainer.parentNode;
+//		parent.insertBefore(newspan, text1);
+//		newspan.appendChild(parent.removeChild(text1));
+
 		var textnode = range.startContainer;
 		textnode.splitText(range.endOffset);
 		var text1 = textnode.splitText(range.startOffset);
 		var newspan = document.createElement('span');
 		var range2 = document.createRange();
 		range2.selectNode(text1);
-		range2.surroundContents(newspan);
+		range2.surroundContents(newspan); //surroundContentsがOperaで問題になる可能性あり。
 		range2.detach();
 		range.selectNode(newspan);
 	}
-        else{
-        	var newone = range.startContainer.splitText(range.startOffset);
-		var newspan = document.createElement('span');
-		var range2 = document.createRange();
-		range2.selectNode(newone);
-		range2.surroundContents(newspan);
-		range2.detach();
-		range.setStartBefore(newspan);
-        }
+	else{
+      	var newone = range.startContainer.splitText(range.startOffset);
+	var newspan = document.createElement('span');
+	var range2 = document.createRange();
+	range2.selectNode(newone);
+	range2.surroundContents(newspan);
+	range2.detach();
+	range.setStartBefore(newspan);
+	}
 }
 
 if(range.endContainer.nodeType == Node.TEXT_NODE){
 	range.endContainer.splitText(range.endOffset);
 	var newspan = document.createElement('span');
-	var range2 = document.createRange();
-	range2.selectNode(range.endContainer);
-	range2.surroundContents(newspan);
-	range2.detach();
+	var parent = range.endContainer.parentNode;
+	//選択状態の領域にspanが挿入されるので、選択範囲が狭くならない
+	parent.insertBefore(newspan, range.endContainer);
+	newspan.appendChild(parent.removeChild(range.endContainer));
 	range.setEndAfter(newspan);
 }
+
  
 var currentNode = range.startContainer;
 var range2 = document.createRange();
@@ -90,6 +104,6 @@ while(true){
 		continue;
 	}
 }
-range2.detach();
 
 }
+

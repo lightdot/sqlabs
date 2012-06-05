@@ -32,14 +32,12 @@ class EditableView extends SmartEditor.ElementView
     @
 
   fontSizeOfSelectRange: (obj) =>
-    _change('fontSize', obj.val)
 #    document.execCommand('fontsize', obj.val)
-
+    _change('fontSize', obj.val)
     @
 
   fontWeightOfSelectRange: (obj) =>
     _change('fontWeight', obj.val)
-
     @
   
   insertImg: (obj) =>

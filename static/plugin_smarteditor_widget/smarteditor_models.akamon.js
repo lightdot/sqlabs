@@ -244,7 +244,7 @@
         "_action": "edit",
         "_managed_html": this.el.content_id
       }, this.el.form_id, function() {
-        var elm, hid, name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _results;
+        var closest, elm, hid, name, _i, _j, _len, _len2, _ref, _ref2, _ref3, _results;
         _this.model.set({
           'loading': false,
           'locked': false
@@ -267,7 +267,8 @@
           _results = [];
           for (_j = 0, _len2 = _ref3.length; _j < _len2; _j++) {
             elm = _ref3[_j];
-            if ($(elm).closest('.managed_html_content_block')[0] === _this.el) {
+            closest = $(elm).closest('.managed_html_content_block');
+            if (closest.length > 0 && closest[0] === _this.el) {
               _results.push(smartEditor.resetTargetElement(elm));
             } else {
               _results.push(void 0);
