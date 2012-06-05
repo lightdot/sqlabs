@@ -205,6 +205,7 @@
         });
         $data.find('[content_type=script]').remove();
         $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove();
+        $data.removeAttr('contenteditable');
         $("#" + this.el.form_id + " form textarea").text($data.html());
       } else if ($("#" + this.el.form_id + " form textarea").attr('name') === 'html') {
         $("#" + this.el.form_id + " form textarea").text(this.$el.find('.managed_html_content_inner').html());
