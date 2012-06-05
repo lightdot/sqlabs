@@ -104,7 +104,7 @@
       this.$el = $(this.el);
       this.el.content_id = this.el.id.replace('managed_html_content_block_', '');
       this.el.form_id = "managed_html_content_form_" + this.el.content_id;
-      if (0 < $(this.model.get('targetEl')).closest('[contenteditable=true]').length) {
+      if (this.$el.is('.editing')) {
         _ref = ['back', 'commit', 'insert', 'html_editor'];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           name = _ref[_i];
@@ -126,7 +126,7 @@
           name = _ref3[_k];
           this.model.schema[name].disabled = true;
         }
-        _ref4 = ['move', 'insert', 'html_editor', 'delete'];
+        _ref4 = ['insert', 'html_editor', 'delete'];
         for (_l = 0, _len4 = _ref4.length; _l < _len4; _l++) {
           name = _ref4[_l];
           this.model.schema[name].disabled = false;
@@ -152,6 +152,7 @@
     ManagedHTMLView.prototype.back = function(obj) {
       var _this = this;
       $("*", this.$el).attr("contenteditable", false);
+      this.$el.removeClass('editing');
       this.model.set({
         'locked': true,
         'loading': true
@@ -173,6 +174,7 @@
       var $data, dom, postData, text,
         _this = this;
       $("*", this.$el).attr("contenteditable", false);
+      this.$el.removeClass('editing');
       this.model.set({
         'loading': true,
         'locked': true
@@ -251,6 +253,7 @@
           'locked': false
         });
         $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
+        _this.$el.addClass('editing');
         if ($('#' + _this.el.form_id + " form textarea").attr('name') !== 'handlebars') {
           _ref = ['insert', 'html_editor'];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -276,6 +279,8 @@
             }
           }
           return _results;
+        } else {
+          return smartEditor.setTargetElement(_this.$el);
         }
       });
       return this;
