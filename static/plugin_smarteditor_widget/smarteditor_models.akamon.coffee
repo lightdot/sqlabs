@@ -26,11 +26,14 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @model.bind("openEdit", @openEdit)
     @model.bind("closeEdit", @closeEdit)
     @$el = $(@el)
+
     @el.content_id = @el.id.replace('managed_html_content_block_', '')
     @el.form_id = "managed_html_content_form_"+@el.content_id
     
-    if 0 < $(@model.get('targetEl')).closest('[contenteditable=true]').length
+#    if 0 < $(@model.get('targetEl')).closest('[contenteditable=true]').length
+    if this.$el.is('.editing')
       @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
+#      @model.schema[name].disabled = false for name in                   ['insert', 'html_editor', 'delete']
     else
       @model.schema[name].disabled = false for name in ['edit', 'history']
     
@@ -39,8 +42,8 @@ class ManagedHTMLView extends SmartEditor.ElementView
       
     if 0 != @$el.closest("div[contenteditable=true][id!="+@el.id+"]").length and 0 != @$el.closest(".handlebars_content_block").find('.managed_html_content_inner').length
       @model.schema[name].disabled = true for name in ['edit','history', 'back', 'commit', 'insert', 'html_editor']
-      @model.schema[name].disabled = false for name in ['move', 'insert', 'html_editor', 'delete']
-      
+      @model.schema[name].disabled = false for name in ['insert', 'html_editor', 'delete']
+
     $('.managed_html_content_anchor_pending, .managed_html_content_anchor').attr "contenteditable", false
     
     for plugin in SmartEditorPlugins.contenteditable
@@ -55,6 +58,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
 
   back: (obj) =>
     $("*", @$el).attr "contenteditable", false
+    @$el.removeClass('editing')
     @model.set 
       'locked': true
       'loading': true
@@ -67,6 +71,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
 
   commit: (obj) =>
     $("*", @$el).attr "contenteditable", false
+    @$el.removeClass('editing')
     @model.set 
       'loading': true
       'locked': true
@@ -132,11 +137,14 @@ class ManagedHTMLView extends SmartEditor.ElementView
 #      @model.schema[name].disabled = true for name in ['edit', 'html_editor', 'publish', 'history', 'edit']
 #      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
 #      @model.trigger 'updatedSchema'
+
       $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
+      @$el.addClass('editing')
+
       if $('#'+@el.form_id+" form textarea").attr('name') != 'handlebars'
         @model.schema[name].disabled = true for name in ['insert', 'html_editor']
         @model.trigger 'updatedSchema'
-      
+
       if SmartEditorPlugins.edit_dialog[@$el.attr('content_type')]
         SmartEditorPlugins.edit_dialog[@$el.attr('content_type')](@model, this)
 
@@ -146,6 +154,8 @@ class ManagedHTMLView extends SmartEditor.ElementView
           closest = $(elm).closest('.managed_html_content_block')
           if closest.length>0 && closest[0]==@el
             smartEditor.setTargetElement(elm)
+      else
+        smartEditor.setTargetElement(@$el)
     @
   
   html_editor: =>
