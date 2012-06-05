@@ -146,6 +146,9 @@
     };
 
     ManagedHTMLView.prototype.closeEdit = function() {
+      this.model.unbind('openEdit');
+      this.model.unbind('closeEdit');
+      this.unbind();
       return this;
     };
 
