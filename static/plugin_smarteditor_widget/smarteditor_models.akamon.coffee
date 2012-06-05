@@ -93,6 +93,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
         $data.find('[hid='+$(this).attr('hid')+']').html(SmartEditor.utils.remove_document_write($(this).html()))
       $data.find('[content_type=script]').remove()
       $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove()
+      $data.removeAttr('contenteditable')
       $("#"+@el.form_id+" form textarea").text($data.html())
 
     else if $("#"+@el.form_id+" form textarea").attr('name') is 'html'

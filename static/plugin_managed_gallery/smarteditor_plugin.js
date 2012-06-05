@@ -4,13 +4,9 @@
   SmartEditorPlugins.contenteditable.push('gallery');
 
   SmartEditorPlugins.edit_dialog['gallery'] = function(model, view) {
-    var baseEl, dialog;
+    var dialog;
     _this.model = model;
     _this.view = view;
-    baseEl = $(_this.model.targetEl);
-    if (baseEl.attr('hid') === void 0) {
-      baseEl = baseEl.closest(".handlebars_content_block");
-    }
     dialog = SmartEditor.utils.dialog('form_gallery', "<table><tbody>" + "<tr><td class=\"w2p_fw\"><label>effect: </label></td><td><select name=\"effect\"><option value=\"wave\">wave</option><option value=\"zipper\">zipper</option><option value=\"curtain\">curtain</option></select></td>" + "<td class=\"w2p_fw\"><label>width: </label></td><td><input class=\"integer\" name=\"width\" type=\"text\" value=\"\"></td>" + "<td class=\"w2p_fw\"><label>height: </label></td><td><input class=\"integer\" name=\"height\" type=\"text\" value=\"\"></td>" + "<td class=\"w2p_fw\"><label>切替秒数: </label></td><td><input class=\"integer\" name=\"delay\" type=\"text\" value=\"\"></td></tr>" + "</tbody></table>" + "<div><a id=\"new_gallery_file\" class=\"btn w2p_trap\" href=\"#\" style=\"float:left;margin-right:20px;\"><span class=\"ui-icon  ui-icon-plusthick\"></span><span class=\"ui-button-text\">画像選択</span></a></div>" + "<div style=\"clear:both;\"></div><br/>" + "<table class=\"solidtable\" id=\"managed_html__managed_html_image_grid_form_maintable\"><thead>" + "<tr><th colspan=\"2\">ファイル</th></tr>" + "</tbody></table>" + "<table><tbody><tr id=\"submit_record__row\"><td class=\"w2p_fw\"><input type=\"button\" name=\"submit_button\" value=\"登録する\"></td></tr></tbody></table>");
     dialog.find('#new_gallery_file').click(function() {
       var new_dialog;
@@ -39,7 +35,7 @@
       });
       return new_dialog.show();
     });
-    baseEl.find('img[file_id]').each(function() {
+    $(_this.view.el).find('img[file_id]').each(function() {
       return dialog.find('.solidtable').append($("<tr>").append($("<td>").append($("<a>").attr({
         'href': $(this).attr('src'),
         "target": "_blank"

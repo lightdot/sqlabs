@@ -2,10 +2,6 @@ SmartEditorPlugins.contenteditable.push 'gallery'
 
 SmartEditorPlugins.edit_dialog['gallery'] = (@model, @view) =>
 
-  baseEl = $(@model.targetEl)
-  if baseEl.attr('hid') is undefined
-    baseEl = baseEl.closest(".handlebars_content_block")
-
   dialog = SmartEditor.utils.dialog 'form_gallery', 
     "<table><tbody>" + 
     "<tr><td class=\"w2p_fw\"><label>effect: </label></td><td><select name=\"effect\"><option value=\"wave\">wave</option><option value=\"zipper\">zipper</option><option value=\"curtain\">curtain</option></select></td>" + 
@@ -42,7 +38,7 @@ SmartEditorPlugins.edit_dialog['gallery'] = (@model, @view) =>
         new_dialog.remove()
     new_dialog.show()
     
-  baseEl.find('img[file_id]').each ->
+  $(@view.el).find('img[file_id]').each ->
     dialog.find('.solidtable').append(
       $("<tr>").append(
         $("<td>").append(
