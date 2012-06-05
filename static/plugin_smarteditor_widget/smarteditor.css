@@ -14,6 +14,7 @@ div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div
 .smarteditor-main-panel .buttons li {
   display: inline;
   list-style: none;
+  position: relative;
 }
 
 .smartedit .smartedit_buttons {
@@ -155,7 +156,7 @@ div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div
   width: 22px;
   height: 22px;
   background-image: url(elrte-toolbar.png);
-  display: block;
+  display: inline-block;
   text-indent: -99999px;
   overflow: hidden;
   background-repeat: no-repeat;
