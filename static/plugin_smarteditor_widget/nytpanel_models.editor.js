@@ -251,9 +251,24 @@
     ImgView;
 
     ImgView.prototype.image_change = function() {
-      var src;
-      src = prompt('URL', this.$el.attr('src'));
-      if (src) return this.$el.attr('src', src);
+      var dialog, el;
+      el = this.$el;
+      dialog = SmartEditor.utils.dialog('managed_html_image_chooser', "loading...");
+      managed_html_ajax_page(document.location, {
+        "_action": "image_chooser",
+        "_managed_html_image_grid": 'True'
+      }, 'content_managed_html_image_chooser', function() {
+        dialog.find('.ui-btn[href=#]').attr('onclick', '');
+        return dialog.find('.ui-btn[href=#]').click(function() {
+          el.attr({
+            'src': $(this).closest('tr').find('textarea').val(),
+            'height': el.height() + 'px',
+            'width': el.width() + 'px'
+          });
+          return dialog.remove();
+        });
+      });
+      return dialog.show();
     };
 
     ImgView;
