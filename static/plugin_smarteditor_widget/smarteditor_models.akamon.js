@@ -146,6 +146,9 @@
     };
 
     ManagedHTMLView.prototype.closeEdit = function() {
+      this.model.unbind('openEdit');
+      this.model.unbind('closeEdit');
+      this.unbind();
       return this;
     };
 
@@ -224,9 +227,9 @@
           'loading': false,
           'locked': false
         });
-        smartEditor.setTargetElement(_this.el);
         _this.$el.addClass('managed_html_content_block_pending');
-        return $('#' + _this.el.form_id).remove();
+        $('#' + _this.el.form_id).remove();
+        return smartEditor.setTargetElement(_this.el);
       });
       return this;
     };

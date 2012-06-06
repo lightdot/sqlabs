@@ -30,16 +30,14 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @el.content_id = @el.id.replace('managed_html_content_block_', '')
     @el.form_id = "managed_html_content_form_"+@el.content_id
     
-#    if 0 < $(@model.get('targetEl')).closest('[contenteditable=true]').length
     if this.$el.is('.editing')
       @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
-#      @model.schema[name].disabled = false for name in                   ['insert', 'html_editor', 'delete']
     else
       @model.schema[name].disabled = false for name in ['edit', 'history']
     
     if @$el.hasClass('managed_html_content_block_pending') and $('#'+@el.form_id).length == 0
       @model.schema.publish.disabled = false
-      
+
     if 0 != @$el.closest("div[contenteditable=true][id!="+@el.id+"]").length and 0 != @$el.closest(".handlebars_content_block").find('.managed_html_content_inner').length
       @model.schema[name].disabled = true for name in ['edit','history', 'back', 'commit', 'insert', 'html_editor']
       @model.schema[name].disabled = false for name in ['insert', 'html_editor', 'delete']
@@ -54,6 +52,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @
 
   closeEdit: =>
+    @model.unbind('openEdit')
+    @model.unbind('closeEdit')
+    @unbind()
     @
 
   back: (obj) =>
@@ -113,10 +114,10 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-      smartEditor.setTargetElement(@el)
 
       @$el.addClass('managed_html_content_block_pending')
       $('#'+@el.form_id).remove()
+      smartEditor.setTargetElement(@el)
     @
 
   edit: =>
@@ -134,9 +135,6 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-#      @model.schema[name].disabled = true for name in ['edit', 'html_editor', 'publish', 'history', 'edit']
-#      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
-#      @model.trigger 'updatedSchema'
 
       $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
       @$el.addClass('editing')
