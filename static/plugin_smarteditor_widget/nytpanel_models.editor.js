@@ -366,7 +366,17 @@
     LinkModel.prototype.schema = {
       'src': {
         type: 'Action',
-        title: 'リンクurl'
+        title: 'リンクurl',
+        conflicts: [
+          {
+            model: 'Editable',
+            schema: 'createLink'
+          }
+        ]
+      },
+      'remove': {
+        type: 'Action',
+        title: 'リンク解除'
       }
     };
 
@@ -380,6 +390,7 @@
 
     function LinkView() {
       this.src = __bind(this.src, this);
+      this.remove = __bind(this.remove, this);
       this.closeEdit = __bind(this.closeEdit, this);
       this.openEdit = __bind(this.openEdit, this);
       LinkView.__super__.constructor.apply(this, arguments);
@@ -405,6 +416,20 @@
     };
 
     LinkView.prototype.closeEdit = function() {
+      this.model.unbind("src");
+      this.model.unbind("remove");
+      this.model.unbind("openEdit");
+      this.model.unbind("closeEdit");
+      return this;
+    };
+
+    LinkView.prototype.remove = function(obj) {
+      var parent;
+      parent = this.el.parentNode;
+      console.log(this.el.childNodes);
+      this.$el.after(this.el.childNodes);
+      this.$el.remove();
+      smartEditor.setTargetElement(parent);
       return this;
     };
 

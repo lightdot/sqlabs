@@ -400,17 +400,36 @@ Exposed global class
     };
 
     MainPanelView.prototype.changeSchemas = function() {
-      var editorModel, hasModel, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _len, _ref, _ref2;
+      var disables, editorModel, hasModel, isConflict, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _j, _len, _len2, _ref, _ref2, _ref3;
       editorModel = this.model;
       targetModels = editorModel.get("targetModels");
       this.$buttonsEl.empty();
       hasModel = false;
+      disables = [];
       for (_i = 0, _len = targetModels.length; _i < _len; _i++) {
         targetModel = targetModels[_i];
+        _ref = targetModel.schema;
+        for (name in _ref) {
+          obj = _ref[name];
+          if (obj.conflicts && !obj.disabled) {
+            disables = disables.concat(obj.conflicts);
+          }
+        }
+      }
+      console.log(disables);
+      isConflict = function(model, schema_name) {
+        var disable, _j, _len2;
+        for (_j = 0, _len2 = disables.length; _j < _len2; _j++) {
+          disable = disables[_j];
+          return (model.name === disable.model) && (schema_name === disable.schema);
+        }
+      };
+      for (_j = 0, _len2 = targetModels.length; _j < _len2; _j++) {
+        targetModel = targetModels[_j];
         if (SmartEditor.widgetMapper[targetModel.name] != null) {
-          _ref = SmartEditor.widgetMapper[targetModel.name];
-          for (widget in _ref) {
-            schema = _ref[widget];
+          _ref2 = SmartEditor.widgetMapper[targetModel.name];
+          for (widget in _ref2) {
+            schema = _ref2[widget];
             widgets = SmartEditor.widgets;
             if (widgets[widget] != null) {
               m = new widgets[widget].M({
@@ -425,10 +444,10 @@ Exposed global class
             }
           }
         } else {
-          _ref2 = targetModel.schema;
-          for (name in _ref2) {
-            obj = _ref2[name];
-            if (!obj.disabled) {
+          _ref3 = targetModel.schema;
+          for (name in _ref3) {
+            obj = _ref3[name];
+            if (!obj.disabled && !isConflict(targetModel, name)) {
               this.$buttonsEl.append(this.createWidget(name, obj, targetModel));
               hasModel = true;
             }

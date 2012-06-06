@@ -199,7 +199,8 @@ SmartEditor.factories.push (target_el) =>
 class LinkModel extends SmartEditor.ElementModel
   name: 'Link'
   schema:
-    'src': {type: 'Action', title:'リンクurl'}
+    'src': {type: 'Action', title:'リンクurl', conflicts:[{model:'Editable', schema:'createLink'}]}
+    'remove': {type: 'Action', title:'リンク解除'}
 
 class LinkView extends SmartEditor.ElementView
   initialize: ->
@@ -216,12 +217,25 @@ class LinkView extends SmartEditor.ElementView
     @
 
   closeEdit: =>
+    @model.unbind("src")
+    @model.unbind("remove")
+    @model.unbind("openEdit")
+    @model.unbind("closeEdit")
+    @
+
+  remove: (obj) =>
+    parent = @el.parentNode
+    console.log @el.childNodes
+    @$el.after(@el.childNodes)
+    @$el.remove()
+    smartEditor.setTargetElement(parent)
     @
 
   src: (obj) =>
     url = prompt('URL',@$el.attr('href'))
     @$el.attr('href', url)
     @
+
 
 SmartEditor.factories.push (target_el) =>
   el = $(target_el).closest("div[contenteditable=true]")[0]
