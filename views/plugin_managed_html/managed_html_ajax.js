@@ -7,13 +7,6 @@ jQuery.extend(jQuery.easing,
 
 (function($) {$(function(){
   
-  $('a[href]').click(function(){
-    $(this).attr('href').match(/page="\/([^"]+)" tenant="([^"]+)"/g);
-    var page = RegExp.$1;
-    var tenant = RegExp.$2;
-    $(this).attr('href', page)
-  })
-  
   managed_html_init_blocks();
   
   // ---------------------------------------------------------------------------
