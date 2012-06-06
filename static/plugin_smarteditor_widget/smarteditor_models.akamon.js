@@ -117,6 +117,9 @@
           this.model.schema[name].disabled = false;
         }
       }
+      console.log(this.$el);
+      console.log(this.el.form_id);
+      console.log($('#' + this.el.form_id));
       if (this.$el.hasClass('managed_html_content_block_pending') && $('#' + this.el.form_id).length === 0) {
         this.model.schema.publish.disabled = false;
       }

@@ -114,10 +114,10 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'loading': false
         'locked': false
-      smartEditor.setTargetElement(@el)
 
       @$el.addClass('managed_html_content_block_pending')
       $('#'+@el.form_id).remove()
+      smartEditor.setTargetElement(@el)
     @
 
   edit: =>
