@@ -764,7 +764,8 @@ jQuery(function(){
     
     def url_helper(self, this, **kwdargs):
         if 'page' in kwdargs:
-            href = current.response.page_url(kwdargs['page'], kwdargs.get('tenant', None))
+            # href = current.response.page_url(kwdargs['page'], kwdargs.get('tenant', None))
+            href = '{{url page="%s" tenant="%s"}}'%(kwdargs['page'], kwdargs['tenant'])
         else:
             href = ""
         current.response.write(XML(href).xml(), escape=False)
