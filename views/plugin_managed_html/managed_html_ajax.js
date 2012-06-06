@@ -7,7 +7,7 @@ jQuery.extend(jQuery.easing,
 
 (function($) {$(function(){
   
-  $('a[href]').each(function(){
+  $('a[href]').click(function(){
     $(this).attr('href').match(/page="\/(\S+)" tenant="(\S+)"/g);
     var page = RegExp.$1;
     var tenant = RegExp.$2;
