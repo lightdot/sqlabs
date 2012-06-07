@@ -349,8 +349,7 @@ Exposed global class
 
     MainPanelView.prototype.changeVisibility = function() {
       if (this.model.get('visibility')) {
-        this.$el.show('fast');
-        return this.changePosition();
+        return this.$el.show('fast');
       } else {
         return this.$el.hide('fast');
       }

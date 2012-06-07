@@ -255,7 +255,6 @@ class SmartEditor.MainPanelView extends Backbone.View
   changeVisibility: =>
     if @model.get('visibility')
       @$el.show 'fast'
-      @changePosition()
     else
       @$el.hide 'fast'
 

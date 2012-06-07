@@ -102,6 +102,8 @@ div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div
 }
 
 .smarteditor-main-panel {
+  top:0;
+  left:0;
   display: none;
   position: absolute;
   padding: 5px;
