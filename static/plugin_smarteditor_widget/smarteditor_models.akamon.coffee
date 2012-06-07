@@ -293,6 +293,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     $('body').append($('<div>').attr('id', @el.form_id).hide())
     managed_html_ajax_page(document.location, {"_action": "edit", "_managed_html": @el.content_id}, @el.form_id)
     dialog = SmartEditor.utils.dialog 'form_history', "loading..." 
+    self = @
     managed_html_ajax_page document.location, {"_action": "history", "_managed_html_history_grid": @el.content_id}, 'content_form_history', ->
       dialog.find('.ui-btn[href=#]').click ->
         $('#'+el.form_id+' form').find('textarea').val($(this).closest('tr').find('textarea').val())
@@ -304,6 +305,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
         managed_html_ajax_page document.location, postData, el.id, =>
           dialog.remove();
           $('#'+el.form_id).remove()
+          #ヒストリバックは公開前の編集とみなす
+          self.$el.addClass('managed_html_content_block_pending')
+          smartEditor.setTargetElement(self.$el)
     dialog.show()
     @
 

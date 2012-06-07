@@ -485,7 +485,7 @@
     };
 
     ManagedHTMLView.prototype.history = function(obj) {
-      var dialog, el;
+      var dialog, el, self;
       el = this.el;
       $('body').append($('<div>').attr('id', this.el.form_id).hide());
       managed_html_ajax_page(document.location, {
@@ -493,6 +493,7 @@
         "_managed_html": this.el.content_id
       }, this.el.form_id);
       dialog = SmartEditor.utils.dialog('form_history', "loading...");
+      self = this;
       managed_html_ajax_page(document.location, {
         "_action": "history",
         "_managed_html_history_grid": this.el.content_id
@@ -510,7 +511,9 @@
           });
           return managed_html_ajax_page(document.location, postData, el.id, function() {
             dialog.remove();
-            return $('#' + el.form_id).remove();
+            $('#' + el.form_id).remove();
+            self.$el.addClass('managed_html_content_block_pending');
+            return smartEditor.setTargetElement(self.$el);
           });
         });
       });
