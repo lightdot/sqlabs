@@ -240,7 +240,6 @@
         'loading': true,
         'locked': true
       });
-      this.$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)');
       this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
         return $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey');
       });

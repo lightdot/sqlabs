@@ -124,7 +124,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @model.set 
       'loading': true
       'locked': true
-    @$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)')
+#    @$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)')
     @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
       $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey')
 

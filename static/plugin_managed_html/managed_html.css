@@ -1,3 +1,5 @@
+
+
 /* -------------------------------------------------------------------------- */
 
 div.managed_html_content_block, div.managed_html_content, div.managed_html_content_inner,
@@ -42,13 +44,13 @@ div.managed_html_collection_block:hover .managed_html_collection_inner > * {
 
 
 
-div.managed_html_content_block .managed_html_content_inner,
+/*div.managed_html_content_block .managed_html_content_inner,*/
 div.managed_html_content_block .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 236, 82, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 236, 82, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 236, 82, 0.6);
 }
-div.managed_html_content_block:hover .managed_html_content_inner,
+/*div.managed_html_content_block:hover .managed_html_content_inner,*/
 div.managed_html_content_block:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
@@ -58,13 +60,14 @@ div.managed_html_content_block:hover .managed_html_content_inner > * {
   outline: 3px dotted rgba(236, 168, 82, 0.6);
 }
 
-div.managed_html_content_block_pending .managed_html_content_inner,
+/*div.managed_html_content_block_pending .managed_html_content_inner,*/
 div.managed_html_content_block_pending .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(236, 82, 168, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(236, 82, 168, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(236, 82, 168, 0.6);
 }
-div.managed_html_content_block_pending:hover .managed_html_content_inner,
+
+/*div.managed_html_content_block_pending:hover .managed_html_content_inner,*/
 div.managed_html_content_block_pending:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
@@ -74,13 +77,14 @@ div.managed_html_content_block_pending:hover .managed_html_content_inner > * {
   outline: 3px dotted rgba(255, 0, 0, 0.6);
 }
 
-div.managed_html_collection_block .managed_html_collection_inner,
+/*div.managed_html_collection_block .managed_html_collection_inner,*/
 div.managed_html_collection_block .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
 }
-div.managed_html_collection_block:hover .managed_html_collection_inner,
+
+/*div.managed_html_collection_block:hover .managed_html_collection_inner,*/
 div.managed_html_collection_block:hover .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(168, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(168, 82, 236, 0.6);
@@ -97,6 +101,7 @@ div.managed_html_collection_block_pending .managed_html_collection_inner > * {
 
   /*filter: progid:DXImageTransform.Microsoft.Shadow(color='#fb6704', Direction=145, Strength=5);*/
 }
+
 div.managed_html_collection_block_pending:hover .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(251, 50, 4, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(251, 50, 4, 0.6);
@@ -109,14 +114,14 @@ div.managed_html_collection_block_pending:hover .managed_html_collection_inner >
 }
 
 
-
 div.managed_html_block_movable .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
 
-/*  filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=5);*/
+  /*filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=6);*/
 }
+
 div.managed_html_block_movable:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
@@ -131,15 +136,21 @@ div.managed_html_block_movable:hover .managed_html_content_inner > * {
 div.managed_html_content_anchor, div.managed_html_content_anchor_pending {
   width:15px;height:15px;position:absolute;
 }
+
 div.managed_html_content_anchor {
+  filter: alpha(opacity=60);
+  background: #52ec52; /*半透明の画像を作成すべき*/
   background: rgba(82, 236, 82, 0.6);
 }
+
 div.managed_html_content_anchor_pending {
+  filter: alpha(opacity=60);
+  background: #ec52a8; /*半透明の画像を作成すべき*/
   background: rgba(236, 82, 168, 0.6);
-  width:15px;height:15px;
 }
 
 
+/*
 div.managed_html_collection_anchor, div.managed_html_collection_anchor_pending {
   clear:both;
   width:100%;height:25px;
@@ -150,6 +161,7 @@ div.managed_html_collection_anchor {
 div.managed_html_collection_anchor_pending {
   background: rgba(251, 103, 4, 0.6);
 }
+*/
 
 
 /* -------------------------------------------------------------------------- */
@@ -230,6 +242,13 @@ div.managed_html_content_block .btn {
 }
 
 div.managed_html_content_block .btn:hover{background-position:0 -15px;color:#333;text-decoration:none;}
+
+
+div.managed_html_content_block.editing .managed_html_content_inner > *{
+  outline: 3px solid red;
+  outline: 3px solid rgba(255, 0, 0, 0.6);
+}
+
 
 /* -------------------------------------------------------------------------- */
 div.managed_html_content_ctrl {
@@ -998,3 +1017,6 @@ div.tmp_managed_html_content_block:hover > * {
 div.workzone textarea{
   width:95%;
 }
+
+
+
