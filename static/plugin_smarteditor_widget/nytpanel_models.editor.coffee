@@ -58,7 +58,6 @@ class EditableView extends SmartEditor.ElementView
     @
   
   insertImg: (obj) =>
-    
     baseEl = $(@model.targetEl)
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
@@ -245,9 +244,9 @@ class LinkView extends SmartEditor.ElementView
 
   src: (obj) =>
     url = prompt('URL',@$el.attr('href'))
-    @$el.attr('href', url)
+    if url?
+      @$el.attr('href', url)
     @
-
 
 SmartEditor.factories.push (target_el, test_results) =>
   if test_results['isEditable'] and target_el.tagName=='A'

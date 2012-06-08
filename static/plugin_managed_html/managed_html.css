@@ -968,6 +968,7 @@ height: 30px;
 
 .managed_html_dialog .dialog-back{
   background-color:black;-moz-opacity:0.5;opacity:.50;opacity:0.5;
+  filter: alpha(opacity=50);
 }
 .managed_html_dialog .dialog-front{
   padding:16px;

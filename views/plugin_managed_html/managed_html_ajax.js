@@ -27,7 +27,7 @@ jQuery.extend(jQuery.easing,
     }
     topbar.animate({opacity:0.0},{duration:300, queue:false, complete:function(){
       topbar.css('top', offset);
-      topbar.animate({opacity:0.6},{duration:200, queue:false});
+      topbar.animate({opacity:0.7},{duration:200, queue:false});
     }});
   });
   var inner = $('<div class="managed_html_container_fluid"></div>');

@@ -441,7 +441,11 @@
     LinkView.prototype.src = function(obj) {
       var url;
       url = prompt('URL', this.$el.attr('href'));
-      this.$el.attr('href', url);
+      console.log(url != null);
+      if (url != null) {
+        console.log(url);
+        this.$el.attr('href', url);
+      }
       return this;
     };
 
