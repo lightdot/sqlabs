@@ -168,13 +168,14 @@
           'locked': false,
           'loading': false
         });
+        $('#' + _this.el.form_id).remove();
         return smartEditor.setTargetElement(_this.el);
       });
       return this;
     };
 
     ManagedHTMLView.prototype.commit = function(obj) {
-      var $data, dom, postData, text,
+      var $data, cleanEditorAttributes, dom, postData, text,
         _this = this;
       $("*", this.$el).attr("contenteditable", false);
       this.$el.removeClass('editing');
@@ -210,7 +211,11 @@
         });
         $data.find('[content_type=script]').remove();
         $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove();
-        $data.removeAttr('contenteditable');
+        cleanEditorAttributes = function($el) {
+          $('.managed_html_content_block', $el).removeClass('editing disable_editing');
+          return $('*', $el).removeAttr('contenteditable');
+        };
+        cleanEditorAttributes($data);
         $("#" + this.el.form_id + " form textarea").text($data.html());
       } else if ($("#" + this.el.form_id + " form textarea").attr('name') === 'html') {
         $("#" + this.el.form_id + " form textarea").text(this.$el.find('.managed_html_content_inner').html());
@@ -256,6 +261,7 @@
         _this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
           var $children_block;
           $children_block = $(this).closest(".managed_html_content_block");
+          $children_block.removeClass('editing');
           $children_block.addClass('disable_editing');
           $children_block.attr('contenteditable', 'false');
           return $("*", $children_block).removeAttr('contenteditable');
@@ -321,6 +327,7 @@
         }
         _this.model.trigger('updatedSchema');
         form = dialog.find('form');
+        $("*", $("form iframe")[0].contentDocument.body).removeAttr('contenteditable');
         $('#managed_html_content_form_' + _this.el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val());
         try {
           $data = $($('<div>').append(SmartEditor.utils.remove_document_write(form.find('textarea').text())));

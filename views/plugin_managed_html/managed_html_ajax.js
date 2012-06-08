@@ -25,9 +25,9 @@ jQuery.extend(jQuery.easing,
     }else{
       var offset = $(window).innerHeight()-40+menuYloc+$(document).scrollTop()+"px";
     }
-    topbar.animate({opacity:0.0},{duration:500, queue:false, complete:function(){
+    topbar.animate({opacity:0.0},{duration:300, queue:false, complete:function(){
       topbar.css('top', offset);
-      topbar.animate({opacity:0.6},{duration:300, queue:false});
+      topbar.animate({opacity:0.6},{duration:200, queue:false});
     }});
   });
   var inner = $('<div class="managed_html_container_fluid"></div>');

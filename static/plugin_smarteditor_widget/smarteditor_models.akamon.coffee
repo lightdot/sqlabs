@@ -67,6 +67,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'locked': false
         'loading': false
+      $('#'+@el.form_id).remove()
       smartEditor.setTargetElement(@el)
     @
 
@@ -99,7 +100,12 @@ class ManagedHTMLView extends SmartEditor.ElementView
         $data.find('[hid='+$(this).attr('hid')+']').html(SmartEditor.utils.remove_document_write($(this).html()))
       $data.find('[content_type=script]').remove()
       $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove()
-      $data.removeAttr('contenteditable')
+
+      cleanEditorAttributes = ($el) =>
+        $('.managed_html_content_block', $el).removeClass('editing disable_editing')
+        $('*', $el).removeAttr('contenteditable')
+
+      cleanEditorAttributes($data);
       $("#"+@el.form_id+" form textarea").text($data.html())
 
     else if $("#"+@el.form_id+" form textarea").attr('name') is 'html'
@@ -136,8 +142,10 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @$el.addClass('editing')
 
       # 入れ子のhandlebars要素の編集禁止
+      # formを消去する必要がある？
       @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
         $children_block = $(@).closest(".managed_html_content_block")
+        $children_block.removeClass('editing')
         $children_block.addClass('disable_editing')
         $children_block.attr('contenteditable', 'false')
         $("*", $children_block).removeAttr('contenteditable')
@@ -176,8 +184,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.trigger 'updatedSchema'
 
       form = dialog.find('form')
+      $("*", $("form iframe")[0].contentDocument.body).removeAttr('contenteditable')
       $('#managed_html_content_form_'+@el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val())
-      
+
       try
         $data = $($('<div>').append(SmartEditor.utils.remove_document_write(form.find('textarea').text())))
         form.find('textarea').val("<div>"+form.find('textarea').text()+"</div>")
