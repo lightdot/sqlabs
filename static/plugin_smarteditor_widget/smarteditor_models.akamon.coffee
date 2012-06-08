@@ -175,16 +175,21 @@ class ManagedHTMLView extends SmartEditor.ElementView
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
 
+#    $('.managed_html_content_block .managed_html_content_inner').each ->
+#      $children_block = $(@).closest(".managed_html_content_block")
+#      $children_block.removeClass('editing disable_editing')
+#      $children_block.attr('contenteditable', 'false')
+#      $("*", $children_block).removeAttr('contenteditable')
+
     dialog = SmartEditor.utils.dialog 'form_html_editor', "loading..." 
     managed_html_ajax_page document.location, {"_action": "edit", "_managed_html": @el.content_id, 'dummy_form':'true'}, 'content_form_html_editor', =>
       @model.set 
         'loading': false
         'locked': false
-      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
-      @model.trigger 'updatedSchema'
+#      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
+#      @model.trigger 'updatedSchema'
 
       form = dialog.find('form')
-      $("*", $("form iframe")[0].contentDocument.body).removeAttr('contenteditable')
       $('#managed_html_content_form_'+@el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val())
 
       try
@@ -207,8 +212,11 @@ class ManagedHTMLView extends SmartEditor.ElementView
         source_active = dialog.find('.tabsbar .source').hasClass('active')
         if !source_active and iframe.length>0
           key = iframe.next().attr('name')
+          form.find('iframe:first').contents().find('body').removeAttr('contenteditable')
           value = form.find('iframe:first').contents().find('body').html()
           postData[key] = value
+
+        form.find('textarea:first').elrte('destroy')
 
         managed_html_ajax_page document.location, postData, @el.id, =>
           @model.set 
@@ -216,8 +224,11 @@ class ManagedHTMLView extends SmartEditor.ElementView
             'locked': false
           $('#'+@el.form_id).remove()
           @$el.addClass('managed_html_content_block_pending')
-          smartEditor.setTargetElement(@el)
+          #smartEditor.setTargetElement(@el)
         dialog.remove()
+        #$('selector').elrte('destroy');
+        #キャンセル時にformなどは消去するべき?
+      #smartEditor.setTargetElement(@el)
     dialog.show()
     @
   

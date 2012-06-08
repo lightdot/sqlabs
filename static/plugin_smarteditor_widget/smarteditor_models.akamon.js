@@ -315,19 +315,12 @@
         "_managed_html": this.el.content_id,
         'dummy_form': 'true'
       }, 'content_form_html_editor', function() {
-        var $data, form, name, _i, _len, _ref;
+        var $data, form;
         _this.model.set({
           'loading': false,
           'locked': false
         });
-        _ref = ['back', 'commit', 'insert', 'html_editor'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _this.model.schema[name].disabled = false;
-        }
-        _this.model.trigger('updatedSchema');
         form = dialog.find('form');
-        $("*", $("form iframe")[0].contentDocument.body).removeAttr('contenteditable');
         $('#managed_html_content_form_' + _this.el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val());
         try {
           $data = $($('<div>').append(SmartEditor.utils.remove_document_write(form.find('textarea').text())));
@@ -353,17 +346,18 @@
           source_active = dialog.find('.tabsbar .source').hasClass('active');
           if (!source_active && iframe.length > 0) {
             key = iframe.next().attr('name');
+            form.find('iframe:first').contents().find('body').removeAttr('contenteditable');
             value = form.find('iframe:first').contents().find('body').html();
             postData[key] = value;
           }
+          form.find('textarea:first').elrte('destroy');
           managed_html_ajax_page(document.location, postData, _this.el.id, function() {
             _this.model.set({
               'loading': false,
               'locked': false
             });
             $('#' + _this.el.form_id).remove();
-            _this.$el.addClass('managed_html_content_block_pending');
-            return smartEditor.setTargetElement(_this.el);
+            return _this.$el.addClass('managed_html_content_block_pending');
           });
           return dialog.remove();
         });
