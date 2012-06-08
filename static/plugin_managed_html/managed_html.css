@@ -18,6 +18,7 @@ div.managed_html_content {
 
 /* -------------------------------------------------------------------------- */
 
+/*
 div.managed_html_content_block .managed_html_content_inner > *{
   filter: progid:DXImageTransform.Microsoft.Shadow(color='#52ec52', Direction=145, Strength=5);
 }
@@ -41,7 +42,7 @@ div.managed_html_collection_block .managed_html_collection_inner > * {
 div.managed_html_collection_block:hover .managed_html_collection_inner > * {
   filter: progid:DXImageTransform.Microsoft.Shadow(color='#a852ec', Direction=145, Strength=5);
 }
-
+*/
 
 
 /*div.managed_html_content_block .managed_html_content_inner,*/

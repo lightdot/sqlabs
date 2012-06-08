@@ -19,13 +19,16 @@ jQuery.extend(jQuery.easing,
   var topbar = $('<div class="managed_html_topbar" data-dropdown="dropdown" style="height:'+height+'px;top:0px;"></div>');
   var menuYloc = parseInt(topbar.css("top").substring(0,topbar.css("top").indexOf("px")))
   $(window).scroll(function () {
+    var offset;
     if($('.move_topbar:visible').text() == 'Down'){
-      var offset = menuYloc+$(document).scrollTop()+"px";
-      topbar.animate({top:offset},{duration:500,queue:false});
+      offset = menuYloc+$(document).scrollTop()+"px";
     }else{
       var offset = $(window).innerHeight()-40+menuYloc+$(document).scrollTop()+"px";
-      topbar.animate({top:offset},{duration:500,queue:false});
     }
+    topbar.animate({opacity:0.0},{duration:500, queue:false, complete:function(){
+      topbar.css('top', offset);
+      topbar.animate({opacity:0.6},{duration:300, queue:false});
+    }});
   });
   var inner = $('<div class="managed_html_container_fluid"></div>');
   var brand = $('<a class="managed_html_brand" href="{{=home_url}}">{{=home_label}}</a>');
