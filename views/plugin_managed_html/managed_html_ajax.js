@@ -23,7 +23,7 @@ jQuery.extend(jQuery.easing,
       var offset = menuYloc+$(document).scrollTop()+"px";
       topbar.animate({top:offset},{duration:500,queue:false});
     }else{
-      var offset = window.innerHeight-40+menuYloc+$(document).scrollTop()+"px";
+      var offset = $(window).innerHeight()-40+menuYloc+$(document).scrollTop()+"px";
       topbar.animate({top:offset},{duration:500,queue:false});
     }
   });
@@ -74,17 +74,19 @@ jQuery.extend(jQuery.easing,
   secondary_nav.append($('<li><a target="_blank" href="'+live_url+'" style="color:pink;">Check Live Site</a></li>'));
   secondary_nav.append($('<li>').
     append($('<a href="javascript:void();" class="move_topbar" style="color:pink;">Down</a><a href="#" class="move_topbar" style="display:none;color:pink;">Top</a>').
-      click(function(){
+      click(function(e){
+        e.preventDefault();
         $(".move_topbar").toggle();
         if($('.move_topbar:visible').text() == 'Down'){
           var offset = menuYloc+$(document).scrollTop()+"px";
           topbar.animate({top:offset},{duration:500,queue:false});
         }else{
-          var offset = window.innerHeight-40+menuYloc+$(document).scrollTop()+"px";
+          var offset = $(window).innerHeight()-40+menuYloc+$(document).scrollTop()+"px";
           topbar.animate({top:offset},{duration:500,queue:false});
         }
       })
-    ));
+    )
+  );
   
   inner.append(brand);
   inner.append(nav);

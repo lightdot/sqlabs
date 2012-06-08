@@ -122,9 +122,9 @@
       var $buttonEl, $spacerEl, $spanEl, code, name;
       name = this.model.get('name');
       code = SmartEditor.options.menuCSSPrefix + "-" + name;
-      $buttonEl = $("<a href=\"#\" class=\"ui-btn " + code + "\" title=\"" + name + "\">");
-      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">");
-      $spacerEl = $("<span class=\"spacer\">");
+      $buttonEl = $('<a href=\"#\" class=\"ui-btn ' + code + '\" title=\"' + name + '\"></a>');
+      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>");
+      $spacerEl = $("<span class=\"spacer\"></span>");
       $spacerEl.append((this.renderLabel() ? this.renderLabel() : '&nbsp;'));
       $buttonEl.append($spanEl);
       $buttonEl.append($spacerEl);
@@ -252,13 +252,13 @@
       schema = this.model.get('schema');
       elModel = this.model.get('elModel');
       code = SmartEditor.options.menuCSSPrefix + "-" + name;
-      $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + name + '">');
-      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">");
+      $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + name + '"></a>');
+      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>");
       title = schema['title'] ? schema['title'] : '&nbsp;';
       $spacerEl = $("<span class=\"spacer\">" + title + "</span>");
       $buttonEl.append($spanEl);
       $buttonEl.append($spacerEl);
-      $submenu = $('<ul class="dropdown-menu">');
+      $submenu = $('<ul class="dropdown-menu"></ul>');
       createWidget = function(name, schema, elModel) {
         var v;
         v = new TooltipButtonWidgetView({
@@ -279,7 +279,7 @@
           val: obj.val
         }, elModel));
       }
-      this.el.classList.add('dropdown');
+      this.$el.addClass('dropdown');
       this.$el.append($buttonEl);
       this.$el.append($submenu);
       return this;
@@ -345,13 +345,13 @@
         return form.commit();
       });
       code = SmartEditor.options.menuCSSPrefix + "-dropdownforms-" + elModel.name;
-      $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + elModel.name + '">');
-      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">");
+      $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + elModel.name + '"></a>');
+      $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>");
       title = schema['title'] ? schema['title'] : '&nbsp;';
       $spacerEl = $("<span class=\"spacer\">" + title + "</span>");
       $buttonEl.append($spanEl);
       $buttonEl.append($spacerEl);
-      $submenu = $('<ul class="dropdown-menu">');
+      $submenu = $('<ul class="dropdown-menu"></ul>');
       $submenu.append($form_el);
       $form_el.click(function(e) {
         return e.stopPropagation();

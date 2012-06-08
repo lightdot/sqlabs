@@ -279,11 +279,12 @@ class SmartEditor.MainPanelView extends Backbone.View
     if schemaObj.type in (k for k,v of widgets)
       m = new widgets[schemaObj.type].M({name: name, elModel:elModel, schema:schemaObj })
       v = new widgets[schemaObj.type].V({model: m})
-      return v.$el
+      return v.el
     return undefined
 
   changeSchemas: =>
     editorModel = @model
+
     targetModels = editorModel.get("targetModels")
     @$buttonsEl.empty()
     hasModel = false
