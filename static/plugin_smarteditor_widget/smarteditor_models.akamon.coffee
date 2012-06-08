@@ -214,9 +214,6 @@ class ManagedHTMLView extends SmartEditor.ElementView
           @model.set 
             'loading': false
             'locked': false
-          @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
-          @model.schema[name].disabled = false for name in ['edit', 'history', 'publish']
-          @model.trigger 'updatedSchema'
           $('#'+@el.form_id).remove()
           @$el.addClass('managed_html_content_block_pending')
           smartEditor.setTargetElement(@el)

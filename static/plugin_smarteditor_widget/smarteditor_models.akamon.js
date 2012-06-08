@@ -357,22 +357,10 @@
             postData[key] = value;
           }
           managed_html_ajax_page(document.location, postData, _this.el.id, function() {
-            var name, _j, _k, _len2, _len3, _ref2, _ref3;
             _this.model.set({
               'loading': false,
               'locked': false
             });
-            _ref2 = ['back', 'commit', 'insert', 'html_editor'];
-            for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-              name = _ref2[_j];
-              _this.model.schema[name].disabled = true;
-            }
-            _ref3 = ['edit', 'history', 'publish'];
-            for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-              name = _ref3[_k];
-              _this.model.schema[name].disabled = false;
-            }
-            _this.model.trigger('updatedSchema');
             $('#' + _this.el.form_id).remove();
             _this.$el.addClass('managed_html_content_block_pending');
             return smartEditor.setTargetElement(_this.el);
