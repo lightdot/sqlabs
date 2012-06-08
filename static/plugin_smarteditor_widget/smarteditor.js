@@ -395,7 +395,7 @@ Exposed global class
         v = new widgets[schemaObj.type].V({
           model: m
         });
-        return v.$el;
+        return v.el;
       }
     };
 

@@ -1,11 +1,18 @@
-
+function getSelectedRange(){ //please replace.
+  if(!window.getSelection){
+    return window.document.selection.createRange();
+  }
+  else{
+    var selection = window.getSelection();
+    return selection.getRangeAt(0);
+  }
+}
 
 var _change = function(_style,___change){
-var selection = getSelection();
-var range = selection.getRangeAt(0);
-
+var range = getSelectedRange();
 if(range.startContainer.nodeType == Node.TEXT_NODE){
 	if(range.endContainer == range.startContainer){
+
 
 //		分割直後に要素をいれても、範囲指定内とはみなされない。
 //        var second = range.endContainer.splitText(range.endOffset);
@@ -55,6 +62,8 @@ while(true){
 	range2.selectNode(currentNode);
 	if(range2.compareBoundaryPoints(Range.START_TO_START,range)==-1 ||
 	   range2.compareBoundaryPoints(Range.END_TO_END,range)==1){
+
+
 		if(range2.compareBoundaryPoints(Range.START_TO_END,range)<=0){
 			while(currentNode.parentNode || currentNode.nextSibling){
 				if(currentNode.nextSibling){
