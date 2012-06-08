@@ -1,4 +1,21 @@
 
+
+# 要素が編集可能かどうかの判定
+# falseとtrueのどちらがより近い祖先かチェックする
+SmartEditor.elementTests.isEditable = (el, test_results) ->
+  t = $(el).closest("div[contenteditable=true]")
+  f = $(el).closest("div[contenteditable=false]")
+
+  if f.length == 0
+    return t.length > 0
+
+  if t.length > 0
+    return t.find(f).length == 0
+
+  false
+
+
+
 ###
   編集可能領域に対する編集モデル
 ###
@@ -55,16 +72,14 @@ class EditableView extends SmartEditor.ElementView
   createLink: (obj) =>
     document.execCommand('CreateLink',false,window.prompt('URL','http://'));
   
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("[contenteditable=true]")[0]
-
-  if el? and target_el.tagName!='IMG'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName!='IMG'
     model = new EditableModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new EditableView(
       model: model
-      el: el
-      tagName: el.tagName
+      el: target_el
+      tagName: target_el.tagName
     )
 
     return model
@@ -178,10 +193,8 @@ class ImgView extends SmartEditor.ElementView
     @$el.unbind('mouseup')
     @$el.unbind('mousemove')
 
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("[contenteditable=true]")[0]
-
-  if el? and target_el.tagName=='IMG'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName=='IMG'
     model = new ImgModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new ImgView(
@@ -225,7 +238,6 @@ class LinkView extends SmartEditor.ElementView
 
   remove: (obj) =>
     parent = @el.parentNode
-    console.log @el.childNodes
     @$el.after(@el.childNodes)
     @$el.remove()
     smartEditor.setTargetElement(parent)
@@ -237,10 +249,8 @@ class LinkView extends SmartEditor.ElementView
     @
 
 
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("div[contenteditable=true]")[0]
-
-  if el? and target_el.tagName=='A'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName=='A'
     model = new LinkModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new LinkView(

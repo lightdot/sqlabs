@@ -249,6 +249,12 @@ div.managed_html_content_block.editing .managed_html_content_inner > *{
   outline: 3px solid rgba(255, 0, 0, 0.6);
 }
 
+div.managed_html_content_block.disable_editing .managed_html_content_inner > *{
+  outline: 3px solid blue;
+  outline: 3px solid rgba(0, 0, 255, 0.6);
+}
+
+
 
 /* -------------------------------------------------------------------------- */
 div.managed_html_content_ctrl {

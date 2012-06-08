@@ -124,10 +124,6 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @model.set 
       'loading': true
       'locked': true
-#    @$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)')
-    @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
-      $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey')
-
     $('#'+@el.form_id).remove()
     $('body').append($('<div>').attr('id', @el.form_id).hide())
 
@@ -138,6 +134,13 @@ class ManagedHTMLView extends SmartEditor.ElementView
 
       $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
       @$el.addClass('editing')
+
+      # 入れ子のhandlebars要素の編集禁止
+      @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
+        $children_block = $(@).closest(".managed_html_content_block")
+        $children_block.addClass('disable_editing')
+        $children_block.attr('contenteditable', 'false')
+        $("*", $children_block).removeAttr('contenteditable')
 
       if $('#'+@el.form_id+" form textarea").attr('name') != 'handlebars'
         @model.schema[name].disabled = true for name in ['insert', 'html_editor']

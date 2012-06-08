@@ -240,9 +240,6 @@
         'loading': true,
         'locked': true
       });
-      this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
-        return $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey');
-      });
       $('#' + this.el.form_id).remove();
       $('body').append($('<div>').attr('id', this.el.form_id).hide());
       managed_html_ajax_page(document.location, {
@@ -256,6 +253,13 @@
         });
         $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
         _this.$el.addClass('editing');
+        _this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
+          var $children_block;
+          $children_block = $(this).closest(".managed_html_content_block");
+          $children_block.addClass('disable_editing');
+          $children_block.attr('contenteditable', 'false');
+          return $("*", $children_block).removeAttr('contenteditable');
+        });
         if ($('#' + _this.el.form_id + " form textarea").attr('name') !== 'handlebars') {
           _ref = ['insert', 'html_editor'];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {

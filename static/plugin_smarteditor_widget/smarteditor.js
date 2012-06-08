@@ -22,6 +22,8 @@ Exposed global class
 
     SmartEditor.widgetMapper = {};
 
+    SmartEditor.elementTests = {};
+
     SmartEditor.factories = [];
 
     SmartEditor.options = {
@@ -193,12 +195,18 @@ Exposed global class
     };
 
     SmartEditor.prototype.findElementModels = function(targetEl) {
-      var f, models, obj, _i, _len, _ref;
+      var f, func, models, name, obj, testResults, _i, _len, _ref, _ref2;
       models = [];
-      _ref = SmartEditor.factories;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        f = _ref[_i];
-        obj = f(targetEl);
+      testResults = {};
+      _ref = SmartEditor.elementTests;
+      for (name in _ref) {
+        func = _ref[name];
+        testResults[name] = func(targetEl);
+      }
+      _ref2 = SmartEditor.factories;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        f = _ref2[_i];
+        obj = f(targetEl, testResults);
         if (obj != null) models.push(obj);
       }
       return models;

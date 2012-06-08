@@ -1,8 +1,3 @@
-
-/*
-  編集可能領域に対する編集モデル
-*/
-
 (function() {
   var EditableModel, EditableView, ImgModel, ImgView, LinkModel, LinkView, resize_images,
     __hasProp = Object.prototype.hasOwnProperty,
@@ -10,6 +5,19 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     _this = this,
     __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  SmartEditor.elementTests.isEditable = function(el, test_results) {
+    var f, t;
+    t = $(el).closest("div[contenteditable=true]");
+    f = $(el).closest("div[contenteditable=false]");
+    if (f.length === 0) return t.length > 0;
+    if (t.length > 0) return t.find(f).length === 0;
+    return false;
+  };
+
+  /*
+    編集可能領域に対する編集モデル
+  */
 
   EditableModel = (function(_super) {
     var n;
@@ -147,16 +155,15 @@
 
   })(SmartEditor.ElementView);
 
-  SmartEditor.factories.push(function(target_el) {
-    var el, model, view;
-    el = $(target_el).closest("[contenteditable=true]")[0];
-    if ((el != null) && target_el.tagName !== 'IMG') {
+  SmartEditor.factories.push(function(target_el, test_results) {
+    var model, view;
+    if (test_results['isEditable'] && target_el.tagName !== 'IMG') {
       model = new EditableModel();
       model.schema = SmartEditor.utils.clone(model.schema);
       view = new EditableView({
         model: model,
-        el: el,
-        tagName: el.tagName
+        el: target_el,
+        tagName: target_el.tagName
       });
       return model;
     }
@@ -334,10 +341,9 @@
 
   })(SmartEditor.ElementView);
 
-  SmartEditor.factories.push(function(target_el) {
-    var el, model, view;
-    el = $(target_el).closest("[contenteditable=true]")[0];
-    if ((el != null) && target_el.tagName === 'IMG') {
+  SmartEditor.factories.push(function(target_el, test_results) {
+    var model, view;
+    if (test_results['isEditable'] && target_el.tagName === 'IMG') {
       model = new ImgModel();
       model.schema = SmartEditor.utils.clone(model.schema);
       view = new ImgView({
@@ -426,7 +432,6 @@
     LinkView.prototype.remove = function(obj) {
       var parent;
       parent = this.el.parentNode;
-      console.log(this.el.childNodes);
       this.$el.after(this.el.childNodes);
       this.$el.remove();
       smartEditor.setTargetElement(parent);
@@ -444,10 +449,9 @@
 
   })(SmartEditor.ElementView);
 
-  SmartEditor.factories.push(function(target_el) {
-    var el, model, view;
-    el = $(target_el).closest("div[contenteditable=true]")[0];
-    if ((el != null) && target_el.tagName === 'A') {
+  SmartEditor.factories.push(function(target_el, test_results) {
+    var model, view;
+    if (test_results['isEditable'] && target_el.tagName === 'A') {
       model = new LinkModel();
       model.schema = SmartEditor.utils.clone(model.schema);
       view = new LinkView({

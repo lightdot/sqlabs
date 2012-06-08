@@ -13,12 +13,20 @@ class @SmartEditor
   @VERSION: '0.1.0'
 
   @widgets: {}
+
+
   @widgetMapper: {}
 #    'Image':
 #      'DropdownForms':
 #        fields: ['src','width','height']
 #        title:'画像設定'
 
+  # {テスト名: テスト関数, ...}
+  # パネルのターゲットが決定される前に実行されるテスト関数
+  @elementTests: {}
+
+  # パネルのターゲットが決定去れたときに実行されるファクトリメソッド郡
+  # factoryはBackbone.Modelオブジェクトを返す
   @factories: []
 
   @options:
@@ -168,8 +176,12 @@ class @SmartEditor
 
   findElementModels: (targetEl) ->
     models = []
+    testResults = {}
+    for name, func of SmartEditor.elementTests
+      testResults[name] = func(targetEl)
+
     for f in SmartEditor.factories
-      obj = f(targetEl)
+      obj = f(targetEl, testResults)
       if obj?
         models.push(obj)
     return models
@@ -367,6 +379,7 @@ class SmartEditor.ElementView extends Backbone.View
     $(@el).on "click", (e) ->
       e.preventDefault()
       false
+
 
 # TODO REFACTORING
 $ =>
