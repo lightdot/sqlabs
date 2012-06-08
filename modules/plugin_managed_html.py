@@ -285,9 +285,9 @@ class ManagedHTML(object):
             raise HTTP(200, self._history_grid(args=args))
         _files = [
             URL(APP, 'static', 'plugin_managed_html/managed_html.css'),
-            URL(APP, 'static', 'plugin_bootstrap2/bootstrap.min.css'),
+#            URL(APP, 'static', 'plugin_bootstrap2/bootstrap.min.css'),
             URL(APP, 'static', 'plugin_bootstrap2/bootstrap.min.js'),
-            URL(APP, 'static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
+#            URL(APP, 'static', 'plugin_bootstrap2/bootstrap-responsive.min.css'),
             URL(APP, 'static', 'plugin_managed_html/jquery.spinner.js'),
             URL(APP, 'static', 'plugin_managed_html/aop.min.js'),
             URL(APP, 'static', 'plugin_elrte_widget/js/jquery-ui-1.8.16.custom.min.js'),
@@ -296,7 +296,7 @@ class ManagedHTML(object):
             URL(APP, 'static', 'plugin_smarteditor_widget/underscore.js'),
             URL(APP, 'static', 'plugin_smarteditor_widget/backbone.js'),
             URL(APP, 'static', 'plugin_smarteditor_widget/backbone-forms.js'),
-            URL(APP, 'static', 'plugin_smarteditor_widget/backbone-forms.css'),
+#            URL(APP, 'static', 'plugin_smarteditor_widget/backbone-forms.css'),
             URL(APP, 'static', 'plugin_smarteditor_widget/smarteditor.coffee'),
             ]
         _files = _files+self.settings.smarteditor_plugins
@@ -764,7 +764,11 @@ jQuery(function(){
     
     def url_helper(self, this, **kwdargs):
         if 'page' in kwdargs:
-            href = current.response.page_url(kwdargs['page'], kwdargs.get('tenant', None))
+            _arg0 = current.request.args(0)
+            if _arg0 and (EDIT_MODE in _arg0):
+                href = '{{url page="%s" tenant="%s"}}'%(kwdargs['page'], kwdargs['tenant'])
+            else:
+                href = current.response.page_url(kwdargs['page'], kwdargs.get('tenant', None))
         else:
             href = ""
         current.response.write(XML(href).xml(), escape=False)

@@ -153,7 +153,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
           if closest.length>0 && closest[0]==@el
             smartEditor.setTargetElement(elm)
       else
-        smartEditor.setTargetElement(@$el)
+        smartEditor.setTargetElement(@el)
     @
   
   html_editor: =>
@@ -207,6 +207,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
           @model.trigger 'updatedSchema'
           $('#'+@el.form_id).remove()
           @$el.addClass('managed_html_content_block_pending')
+          smartEditor.setTargetElement(@el)
         dialog.remove()
     dialog.show()
     @
@@ -307,7 +308,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
           $('#'+el.form_id).remove()
           #ヒストリバックは公開前の編集とみなす
           self.$el.addClass('managed_html_content_block_pending')
-          smartEditor.setTargetElement(self.$el)
+          smartEditor.setTargetElement(self.el)
     dialog.show()
     @
 
