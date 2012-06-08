@@ -283,7 +283,7 @@
           }
           return _results;
         } else {
-          return smartEditor.setTargetElement(_this.$el);
+          return smartEditor.setTargetElement(_this.el);
         }
       });
       return this;
@@ -364,7 +364,8 @@
             }
             _this.model.trigger('updatedSchema');
             $('#' + _this.el.form_id).remove();
-            return _this.$el.addClass('managed_html_content_block_pending');
+            _this.$el.addClass('managed_html_content_block_pending');
+            return smartEditor.setTargetElement(_this.el);
           });
           return dialog.remove();
         });
@@ -513,7 +514,7 @@
             dialog.remove();
             $('#' + el.form_id).remove();
             self.$el.addClass('managed_html_content_block_pending');
-            return smartEditor.setTargetElement(self.$el);
+            return smartEditor.setTargetElement(self.el);
           });
         });
       });

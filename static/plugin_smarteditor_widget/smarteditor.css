@@ -343,3 +343,121 @@ border-color: #339BB9 #339BB9 #22697D;
 
 .smarteditor-main-panel .ui-icon-toggleForm{background-position:-801px -5px}
 .smarteditor-main-panel .ui-icon-deleteElement{background-position:-180px -2px}
+
+
+
+
+
+.dropdown-menu li {
+    line-height: 18px;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+}
+
+.dropdown-toggle:active, .open .dropdown-toggle {
+    outline: 0 none;
+}
+
+.caret {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #000000;
+    content: "";
+    display: inline-block;
+    height: 0;
+    opacity: 0.3;
+    vertical-align: top;
+    width: 0;
+}
+
+.dropdown .caret {
+    margin-left: 2px;
+    margin-top: 8px;
+}
+
+.dropdown:hover .caret, .open.dropdown .caret {
+    opacity: 1;
+}
+
+.dropdown-menu {
+    background-clip: padding-box;
+    background-color: #FFFFFF;
+    border-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 5px 5px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    display: none;
+    float: left;
+    left: 0;
+    list-style: none outside none;
+    margin: 0;
+    min-width: 160px;
+    padding: 4px 0;
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+}
+
+.dropdown-menu.pull-right {
+    left: auto;
+    right: 0;
+}
+
+.dropdown-menu .divider {
+    background-color: #E5E5E5;
+    border-bottom: 1px solid #FFFFFF;
+    height: 1px;
+    margin: 8px 1px;
+    overflow: hidden;
+}
+
+.dropdown-menu a {
+    clear: both;
+    color: #333333;
+    display: block;
+    font-weight: normal;
+    line-height: 18px;
+    padding: 3px 15px;
+    white-space: nowrap;
+}
+
+.dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+    background-color: #0088CC;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.dropdown.open {
+}
+
+.dropdown.open .dropdown-toggle {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3);
+    color: #FFFFFF;
+}
+
+.dropdown.open .dropdown-menu {
+    display: block;
+}
+
+.pull-right .dropdown-menu {
+    left: auto;
+    right: 0;
+}
+
+.dropup .caret, .navbar-fixed-bottom .dropdown .caret {
+    border-bottom: 4px solid #000000;
+    border-top: 0 none;
+    content: "↑";
+}
+
+.dropup .dropdown-menu, .navbar-fixed-bottom .dropdown .dropdown-menu {
+    bottom: 100%;
+    margin-bottom: 1px;
+    top: auto;
+}
