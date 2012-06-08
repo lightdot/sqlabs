@@ -7,6 +7,7 @@ div.managed_html_collection_block, div.managed_html_collection, div.managed_html
   display: inline !important;
 }
 
+
 /* -------------------------------------------------------------------------- */
 
 div.managed_html_content {
@@ -14,6 +15,32 @@ div.managed_html_content {
 }
 
 /* -------------------------------------------------------------------------- */
+
+div.managed_html_content_block .managed_html_content_inner > *{
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#52ec52', Direction=145, Strength=5);
+}
+
+div.managed_html_content_block:hover .managed_html_content_inner > * {
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#eca852', Direction=145, Strength=5);
+}
+
+div.managed_html_content_block_pending .managed_html_content_inner > * {
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#ec52a8', Direction=145, Strength=5);
+}
+
+div.managed_html_content_block_pending:hover .managed_html_content_inner > * {
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#ff0000', Direction=145, Strength=5);
+}
+
+div.managed_html_collection_block .managed_html_collection_inner > * {
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=5);
+}
+
+div.managed_html_collection_block:hover .managed_html_collection_inner > * {
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#a852ec', Direction=145, Strength=5);
+}
+
+
 
 div.managed_html_content_block .managed_html_content_inner,
 div.managed_html_content_block .managed_html_content_inner > * {
@@ -26,6 +53,8 @@ div.managed_html_content_block:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
+
+  outline: 3px dotted #eca852;
   outline: 3px dotted rgba(236, 168, 82, 0.6);
 }
 
@@ -40,9 +69,10 @@ div.managed_html_content_block_pending:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
+
+  outline: 3px dotted red;
   outline: 3px dotted rgba(255, 0, 0, 0.6);
 }
-
 
 div.managed_html_collection_block .managed_html_collection_inner,
 div.managed_html_collection_block .managed_html_collection_inner > * {
@@ -55,6 +85,8 @@ div.managed_html_collection_block:hover .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(168, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(168, 82, 236, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(168, 82, 236, 0.6);
+
+  outline: 4px dotted #a852ec;
   outline: 4px dotted rgba(168, 82, 236, 0.6);
 }
 
@@ -62,12 +94,18 @@ div.managed_html_collection_block_pending .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(251, 103, 4, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(251, 103, 4, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(251, 103, 4, 0.6);
+
+  /*filter: progid:DXImageTransform.Microsoft.Shadow(color='#fb6704', Direction=145, Strength=5);*/
 }
 div.managed_html_collection_block_pending:hover .managed_html_collection_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(251, 50, 4, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(251, 50, 4, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 35px rgba(251, 50, 4, 0.6);
+
+  outline: 4px dotted #fb6704;
   outline: 4px dotted rgba(251, 50, 4, 0.6);
+
+  /*filter: progid:DXImageTransform.Microsoft.Shadow(color='#fb3204', Direction=145, Strength=5);*/
 }
 
 
@@ -76,12 +114,16 @@ div.managed_html_block_movable .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 15px rgba(82, 82, 236, 0.6);
+
+/*  filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=5);*/
 }
 div.managed_html_block_movable:hover .managed_html_content_inner > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(82, 82, 236, 0.6);
-  outline:#0000FF dotted 3px;
+  outline: 3px dotted #0000FF;
+
+/*  filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=5);*/
 }
 
 /* -------------------------------------------------------------------------- */
@@ -153,6 +195,8 @@ div.managed_html_content_block form button:hover {
   -webkit-box-shadow: 0px 0px 8px #007eff;  
   -moz-box-shadow: 0px 0px 7px #007eff;  
   box-shadow: 0px 0px 7px #007eff;  
+
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#007eff', Direction=145, Strength=5);
 }
 
 div.managed_html_content_block form a {
@@ -439,7 +483,6 @@ div.managed_html_topbar {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333333', endColorstr='#222222', GradientType=0);
   -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25),inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 div.managed_html_topbar a {
   font-size: 16px;
@@ -647,6 +690,8 @@ padding: .4em 1em .4em 1.8em;
   -webkit-box-shadow: 0px 0px 8px #007eff;  
   -moz-box-shadow: 0px 0px 7px #007eff;  
   box-shadow: 0px 0px 7px #007eff;  
+
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#007eff', Direction=145, Strength=5);
 }
 
 .ui-icon-carat-1-n { background-position: 0 0; }
@@ -932,6 +977,8 @@ div.tmp_managed_html_content_block > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(236, 168, 82, 0.6);
+
+  outline: 3px dotted #eca852;
   outline: 3px dotted rgba(236, 168, 82, 0.6);
 }
 div.tmp_managed_html_content_block:hover,
@@ -939,6 +986,8 @@ div.tmp_managed_html_content_block:hover > * {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
   -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 0, 0, 0.6);
+
+  outline: 3px dotted red;
   outline: 3px dotted rgba(255, 0, 0, 0.6);
 }
 

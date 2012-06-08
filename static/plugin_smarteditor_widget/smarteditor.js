@@ -415,7 +415,6 @@ Exposed global class
           }
         }
       }
-      console.log(disables);
       isConflict = function(model, schema_name) {
         var disable, _j, _len2;
         for (_j = 0, _len2 = disables.length; _j < _len2; _j++) {

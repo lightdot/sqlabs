@@ -293,7 +293,6 @@ class SmartEditor.MainPanelView extends Backbone.View
       for name,obj of targetModel.schema
         if obj.conflicts and not obj.disabled
           disables = disables.concat obj.conflicts
-    console.log disables
     isConflict = (model, schema_name) ->
       return ((model.name == disable.model) and (schema_name == disable.schema)) for disable in disables
 

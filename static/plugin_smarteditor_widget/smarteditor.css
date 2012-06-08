@@ -1,14 +1,21 @@
 /* 要素のハイライト */
 ._current_editable {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba(236, 82, 82, 0.6);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba(236, 82, 82, 0.6);
+
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#ec5252', Direction=145, Strength=5);
 }
 
 div.row {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba( 82, 236, 82, 0.6);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba( 82, 236, 82, 0.6);
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#52ec52', Direction=145, Strength=5);
 }
 
 div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div.span8, div.span9, div.span10, div.span11, div.span12 {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba(82, 82, 236, 0.6);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset, 0 0 15px rgba(82, 82, 236, 0.6);
+  filter: progid:DXImageTransform.Microsoft.Shadow(color='#5252ec', Direction=145, Strength=5);
 }
 
 /* 編集パネル本体 */

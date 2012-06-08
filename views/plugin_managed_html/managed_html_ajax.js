@@ -72,7 +72,7 @@ jQuery.extend(jQuery.easing,
   {{pass}}
   var secondary_nav = $('<ul class="managed_html_secondary_nav"></ul>');
   secondary_nav.append($('<li><a target="_blank" href="'+live_url+'" style="color:pink;">Check Live Site</a></li>'));
-  secondary_nav.append($('<li>').
+  secondary_nav.append($('<li></li>').
     append($('<a href="javascript:void();" class="move_topbar" style="color:pink;">Down</a><a href="#" class="move_topbar" style="display:none;color:pink;">Top</a>').
       click(function(e){
         e.preventDefault();
