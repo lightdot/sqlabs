@@ -20,6 +20,8 @@ div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div
 
 /* 編集パネル本体 */
 .smarteditor-main-panel {
+  overflow: visible;
+
   display: none;
   position: absolute;
   padding: 5px;
@@ -49,7 +51,8 @@ div.span1, div.span2, div.span3, div.span4, div.span5, div.span6, div.span7, div
   background-image: -webkit-linear-gradient(top, #5BC0DE, #339BB9);
   background-image: -o-linear-gradient(top, #5BC0DE, #339BB9);
   background-image: linear-gradient(top, #5BC0DE, #339BB9);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5bc0de', endColorstr='#339bb9', GradientType=0);
+#  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5bc0de', endColorstr='#339bb9', GradientType=0);
+  filter: none;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   border-color: #339BB9 #339BB9 #22697D;
   border-width: 1px;
@@ -403,7 +406,6 @@ border-color: #339BB9 #339BB9 #22697D;
     border-width: 1px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     display: none;
-    float: left;
     left: 0;
     list-style: none outside none;
     margin: 0;
@@ -411,7 +413,7 @@ border-color: #339BB9 #339BB9 #22697D;
     padding: 4px 0;
     position: absolute;
     top: 100%;
-    z-index: 1000;
+    z-index: 2001;
 }
 
 .smarteditor-main-panel .dropdown-menu.pull-right {
