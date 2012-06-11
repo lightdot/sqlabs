@@ -683,6 +683,12 @@ jQuery(function(){
                         _func(content)
                         #self.write_managed_html(name=name, parent=None, type='handlebars')()
                         raise HTTP(200, response.body.getvalue())
+                    
+                    elif request.vars['_formkey']:
+                        response.flash = T('Edit Failed')
+                        response.body = cStringIO.StringIO()
+                        _func(self._get_content(name))
+                        raise HTTP(200, response.body.getvalue())
                         
                     if len(fields) == 1:
                         form.components = [form.custom.widget[fields[0].name]]

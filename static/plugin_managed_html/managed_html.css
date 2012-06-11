@@ -1026,5 +1026,7 @@ div.workzone textarea{
   width:95%;
 }
 
-
+#content_form_html_editor input{
+  height:24px;
+}
 
