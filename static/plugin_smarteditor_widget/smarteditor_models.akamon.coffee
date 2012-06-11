@@ -67,6 +67,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
       @model.set 
         'locked': false
         'loading': false
+      $('#'+@el.form_id).remove()
       smartEditor.setTargetElement(@el)
     @
 
@@ -100,7 +101,12 @@ class ManagedHTMLView extends SmartEditor.ElementView
         $data.find('[hid='+$(this).attr('hid')+']').html(SmartEditor.utils.remove_document_write($(this).html()))
       $data.find('[content_type=script]').remove()
       $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove()
-      $data.removeAttr('contenteditable')
+
+      cleanEditorAttributes = ($el) =>
+        $('.managed_html_content_block', $el).removeClass('editing disable_editing')
+        $('*', $el).removeAttr('contenteditable')
+
+      cleanEditorAttributes($data);
       $("#"+@el.form_id+" form textarea").text($data.html())
 
     else if $("#"+@el.form_id+" form textarea").attr('name') is 'html'
@@ -125,10 +131,6 @@ class ManagedHTMLView extends SmartEditor.ElementView
     @model.set 
       'loading': true
       'locked': true
-    @$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)')
-    @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
-      $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey')
-
     $('#'+@el.form_id).remove()
     $('body').append($('<div>').attr('id', @el.form_id).hide())
 
@@ -139,6 +141,15 @@ class ManagedHTMLView extends SmartEditor.ElementView
 
       $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
       @$el.addClass('editing')
+
+      # 入れ子のhandlebars要素の編集禁止
+      # formを消去する必要がある？
+      @$el.find('.managed_html_content_block .managed_html_content_inner').each ->
+        $children_block = $(@).closest(".managed_html_content_block")
+        $children_block.removeClass('editing')
+        $children_block.addClass('disable_editing')
+        $children_block.attr('contenteditable', 'false')
+        $("*", $children_block).removeAttr('contenteditable')
 
       if $('#'+@el.form_id+" form textarea").attr('name') != 'handlebars'
         @model.schema[name].disabled = true for name in ['insert', 'html_editor']
@@ -154,7 +165,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
           if closest.length>0 && closest[0]==@el
             smartEditor.setTargetElement(elm)
       else
-        smartEditor.setTargetElement(@$el)
+        smartEditor.setTargetElement(@el)
     @
   
   html_editor: =>
@@ -165,17 +176,23 @@ class ManagedHTMLView extends SmartEditor.ElementView
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
 
+#    $('.managed_html_content_block .managed_html_content_inner').each ->
+#      $children_block = $(@).closest(".managed_html_content_block")
+#      $children_block.removeClass('editing disable_editing')
+#      $children_block.attr('contenteditable', 'false')
+#      $("*", $children_block).removeAttr('contenteditable')
+
     dialog = SmartEditor.utils.dialog 'form_html_editor', "loading..." 
     managed_html_ajax_page document.location, {"_action": "edit", "_managed_html": @el.content_id, 'dummy_form':'true'}, 'content_form_html_editor', =>
       @model.set 
         'loading': false
         'locked': false
-      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
-      @model.trigger 'updatedSchema'
+#      @model.schema[name].disabled = false for name in ['back', 'commit', 'insert', 'html_editor']
+#      @model.trigger 'updatedSchema'
 
       form = dialog.find('form')
       $('#managed_html_content_form_'+@el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val())
-      
+
       try
         $data = $($('<div>').append(SmartEditor.utils.remove_document_write(form.find('textarea').text())))
         form.find('textarea').val("<div>"+form.find('textarea').text()+"</div>")
@@ -196,19 +213,24 @@ class ManagedHTMLView extends SmartEditor.ElementView
         source_active = dialog.find('.tabsbar .source').hasClass('active')
         if !source_active and iframe.length>0
           key = iframe.next().attr('name')
+          form.find('iframe:first').contents().find('body').removeAttr('contenteditable')
           value = form.find('iframe:first').contents().find('body').html()
           postData[key] = value
+
+        form.find('textarea:first').elrte('destroy')
 
         managed_html_ajax_page document.location, postData, @el.id, =>
           @model.set 
             'loading': false
             'locked': false
-          @model.schema[name].disabled = true for name in ['back', 'commit', 'insert', 'html_editor']
-          @model.schema[name].disabled = false for name in ['edit', 'history', 'publish']
-          @model.trigger 'updatedSchema'
           $('#'+@el.form_id).remove()
-          @$el.addClass('managed_html_content_block_pending')
+          @$el.removeClass('editing')
+          smartEditor.setTargetElement(@el)
         dialog.remove()
+
+        #キャンセル時にformなどは消去するべき
+        #form.find('textarea:first').elrte('destroy')
+      #smartEditor.setTargetElement(@el)
     dialog.show()
     @
   
@@ -294,6 +316,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     $('body').append($('<div>').attr('id', @el.form_id).hide())
     managed_html_ajax_page(document.location, {"_action": "edit", "_managed_html": @el.content_id}, @el.form_id)
     dialog = SmartEditor.utils.dialog 'form_history', "loading..." 
+    self = @
     managed_html_ajax_page document.location, {"_action": "history", "_managed_html_history_grid": @el.content_id}, 'content_form_history', ->
       dialog.find('.ui-btn[href=#]').click ->
         $('#'+el.form_id+' form').find('textarea').val($(this).closest('tr').find('textarea').val())
@@ -305,6 +328,9 @@ class ManagedHTMLView extends SmartEditor.ElementView
         managed_html_ajax_page document.location, postData, el.id, =>
           dialog.remove();
           $('#'+el.form_id).remove()
+          #ヒストリバックは公開前の編集とみなす
+          self.$el.addClass('managed_html_content_block_pending')
+          smartEditor.setTargetElement(self.el)
     dialog.show()
     @
 

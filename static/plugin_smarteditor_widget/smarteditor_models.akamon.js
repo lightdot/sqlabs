@@ -168,13 +168,14 @@
           'locked': false,
           'loading': false
         });
+        $('#' + _this.el.form_id).remove();
         return smartEditor.setTargetElement(_this.el);
       });
       return this;
     };
 
     ManagedHTMLView.prototype.commit = function(obj) {
-      var $data, dom, postData, text,
+      var $data, cleanEditorAttributes, dom, postData, text,
         _this = this;
       $("*", this.$el).attr("contenteditable", false);
       this.$el.removeClass('editing');
@@ -211,7 +212,11 @@
         });
         $data.find('[content_type=script]').remove();
         $data.find('.managed_html_content_anchor').closest(".handlebars_content_block").remove();
-        $data.removeAttr('contenteditable');
+        cleanEditorAttributes = function($el) {
+          $('.managed_html_content_block', $el).removeClass('editing disable_editing');
+          return $('*', $el).removeAttr('contenteditable');
+        };
+        cleanEditorAttributes($data);
         $("#" + this.el.form_id + " form textarea").text($data.html());
       } else if ($("#" + this.el.form_id + " form textarea").attr('name') === 'html') {
         $("#" + this.el.form_id + " form textarea").text(this.$el.find('.managed_html_content_inner').html());
@@ -241,10 +246,6 @@
         'loading': true,
         'locked': true
       });
-      this.$el.find('div.managed_html_content_block .managed_html_content_inner,div.managed_html_content_block .managed_html_content_inner > *').css('outline', '3px solid rgba(255, 0, 0, 0.6)');
-      this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
-        return $(this).closest(".managed_html_content_block").attr('contenteditable', 'false').css('background-color', 'grey');
-      });
       $('#' + this.el.form_id).remove();
       $('body').append($('<div>').attr('id', this.el.form_id).hide());
       managed_html_ajax_page(document.location, {
@@ -258,6 +259,14 @@
         });
         $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
         _this.$el.addClass('editing');
+        _this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
+          var $children_block;
+          $children_block = $(this).closest(".managed_html_content_block");
+          $children_block.removeClass('editing');
+          $children_block.addClass('disable_editing');
+          $children_block.attr('contenteditable', 'false');
+          return $("*", $children_block).removeAttr('contenteditable');
+        });
         if ($('#' + _this.el.form_id + " form textarea").attr('name') !== 'handlebars') {
           _ref = ['insert', 'html_editor'];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -284,7 +293,7 @@
           }
           return _results;
         } else {
-          return smartEditor.setTargetElement(_this.$el);
+          return smartEditor.setTargetElement(_this.el);
         }
       });
       return this;
@@ -307,17 +316,11 @@
         "_managed_html": this.el.content_id,
         'dummy_form': 'true'
       }, 'content_form_html_editor', function() {
-        var $data, form, name, _i, _len, _ref;
+        var $data, form;
         _this.model.set({
           'loading': false,
           'locked': false
         });
-        _ref = ['back', 'commit', 'insert', 'html_editor'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _this.model.schema[name].disabled = false;
-        }
-        _this.model.trigger('updatedSchema');
         form = dialog.find('form');
         $('#managed_html_content_form_' + _this.el.content_id).find('input[name=_formkey]').val(form.find('input[name=_formkey]').val());
         try {
@@ -344,28 +347,19 @@
           source_active = dialog.find('.tabsbar .source').hasClass('active');
           if (!source_active && iframe.length > 0) {
             key = iframe.next().attr('name');
+            form.find('iframe:first').contents().find('body').removeAttr('contenteditable');
             value = form.find('iframe:first').contents().find('body').html();
             postData[key] = value;
           }
+          form.find('textarea:first').elrte('destroy');
           managed_html_ajax_page(document.location, postData, _this.el.id, function() {
-            var name, _j, _k, _len2, _len3, _ref2, _ref3;
             _this.model.set({
               'loading': false,
               'locked': false
             });
-            _ref2 = ['back', 'commit', 'insert', 'html_editor'];
-            for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-              name = _ref2[_j];
-              _this.model.schema[name].disabled = true;
-            }
-            _ref3 = ['edit', 'history', 'publish'];
-            for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
-              name = _ref3[_k];
-              _this.model.schema[name].disabled = false;
-            }
-            _this.model.trigger('updatedSchema');
             $('#' + _this.el.form_id).remove();
-            return _this.$el.addClass('managed_html_content_block_pending');
+            _this.$el.removeClass('editing');
+            return smartEditor.setTargetElement(_this.el);
           });
           return dialog.remove();
         });
@@ -486,7 +480,7 @@
     };
 
     ManagedHTMLView.prototype.history = function(obj) {
-      var dialog, el;
+      var dialog, el, self;
       el = this.el;
       $('body').append($('<div>').attr('id', this.el.form_id).hide());
       managed_html_ajax_page(document.location, {
@@ -494,6 +488,7 @@
         "_managed_html": this.el.content_id
       }, this.el.form_id);
       dialog = SmartEditor.utils.dialog('form_history', "loading...");
+      self = this;
       managed_html_ajax_page(document.location, {
         "_action": "history",
         "_managed_html_history_grid": this.el.content_id
@@ -511,7 +506,9 @@
           });
           return managed_html_ajax_page(document.location, postData, el.id, function() {
             dialog.remove();
-            return $('#' + el.form_id).remove();
+            $('#' + el.form_id).remove();
+            self.$el.addClass('managed_html_content_block_pending');
+            return smartEditor.setTargetElement(self.el);
           });
         });
       });

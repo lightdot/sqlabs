@@ -13,12 +13,20 @@ class @SmartEditor
   @VERSION: '0.1.0'
 
   @widgets: {}
+
+
   @widgetMapper: {}
 #    'Image':
 #      'DropdownForms':
 #        fields: ['src','width','height']
 #        title:'画像設定'
 
+  # {テスト名: テスト関数, ...}
+  # パネルのターゲットが決定される前に実行されるテスト関数
+  @elementTests: {}
+
+  # パネルのターゲットが決定去れたときに実行されるファクトリメソッド郡
+  # factoryはBackbone.Modelオブジェクトを返す
   @factories: []
 
   @options:
@@ -168,8 +176,12 @@ class @SmartEditor
 
   findElementModels: (targetEl) ->
     models = []
+    testResults = {}
+    for name, func of SmartEditor.elementTests
+      testResults[name] = func(targetEl)
+
     for f in SmartEditor.factories
-      obj = f(targetEl)
+      obj = f(targetEl, testResults)
       if obj?
         models.push(obj)
     return models
@@ -184,8 +196,8 @@ Main floating panel of the editor
 class SmartEditor.MainPanelModel extends Backbone.Model
   defaults:
     targetLocked: false       #編集対象にロックされたものがある
-    targetEl: undefined	#編集対象としてクリックされた要素
-    targetModels: []		#編集対象が持つモデル(将来的には複数)
+    targetEl: undefined	      #編集対象としてクリックされた要素
+    targetModels: []	      #編集対象が持つモデル(将来的には複数)
     visibility: false         #パネルが表示されている
     position:                 #パネルの表示位置
       x: 0
@@ -255,7 +267,6 @@ class SmartEditor.MainPanelView extends Backbone.View
   changeVisibility: =>
     if @model.get('visibility')
       @$el.show 'fast'
-      @changePosition()
     else
       @$el.hide 'fast'
 
@@ -280,14 +291,23 @@ class SmartEditor.MainPanelView extends Backbone.View
     if schemaObj.type in (k for k,v of widgets)
       m = new widgets[schemaObj.type].M({name: name, elModel:elModel, schema:schemaObj })
       v = new widgets[schemaObj.type].V({model: m})
-      return v.$el
+      return v.el
     return undefined
 
   changeSchemas: =>
     editorModel = @model
+
     targetModels = editorModel.get("targetModels")
     @$buttonsEl.empty()
     hasModel = false
+    disables = []
+    for targetModel in targetModels
+      for name,obj of targetModel.schema
+        if obj.conflicts and not obj.disabled
+          disables = disables.concat obj.conflicts
+    isConflict = (model, schema_name) ->
+      return ((model.name == disable.model) and (schema_name == disable.schema)) for disable in disables
+
     for targetModel in targetModels
       if SmartEditor.widgetMapper[targetModel.name]?
         for widget, schema of SmartEditor.widgetMapper[targetModel.name]
@@ -298,7 +318,7 @@ class SmartEditor.MainPanelView extends Backbone.View
             @$buttonsEl.append w.el
             hasModel=true
       else
-        ((@$buttonsEl.append @createWidget(name, obj, targetModel); hasModel=true) if not obj.disabled) for name,obj of targetModel.schema
+        ((@$buttonsEl.append @createWidget(name, obj, targetModel); hasModel=true) if not obj.disabled and not isConflict(targetModel,name)) for name,obj of targetModel.schema
     @model.set {'visibility': hasModel}
     @
 
@@ -359,6 +379,7 @@ class SmartEditor.ElementView extends Backbone.View
     $(@el).on "click", (e) ->
       e.preventDefault()
       false
+
 
 # TODO REFACTORING
 $ =>

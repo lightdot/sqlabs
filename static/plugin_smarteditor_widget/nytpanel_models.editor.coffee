@@ -1,4 +1,21 @@
 
+
+# 要素が編集可能かどうかの判定
+# falseとtrueのどちらがより近い祖先かチェックする
+SmartEditor.elementTests.isEditable = (el, test_results) ->
+  t = $(el).closest("div[contenteditable=true]")
+  f = $(el).closest("div[contenteditable=false]")
+
+  if f.length == 0
+    return t.length > 0
+
+  if t.length > 0
+    return t.find(f).length == 0
+
+  false
+
+
+
 ###
   編集可能領域に対する編集モデル
 ###
@@ -41,11 +58,10 @@ class EditableView extends SmartEditor.ElementView
     @
   
   insertImg: (obj) =>
-    
     baseEl = $(@model.targetEl)
     if baseEl.attr('hid') is undefined
       baseEl = baseEl.closest(".handlebars_content_block")
-    
+
     document.execCommand('insertImage',false,'dummy-image');
     dialog = SmartEditor.utils.dialog 'managed_html_image_chooser', "loading..." 
     managed_html_ajax_page document.location, {"_action": "image_chooser", "_managed_html_image_grid": 'True',}, 'content_managed_html_image_chooser'
@@ -55,16 +71,14 @@ class EditableView extends SmartEditor.ElementView
   createLink: (obj) =>
     document.execCommand('CreateLink',false,window.prompt('URL','http://'));
   
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("[contenteditable=true]")[0]
-
-  if el? and target_el.tagName!='IMG'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName!='IMG'
     model = new EditableModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new EditableView(
       model: model
-      el: el
-      tagName: el.tagName
+      el: target_el
+      tagName: target_el.tagName
     )
 
     return model
@@ -178,10 +192,8 @@ class ImgView extends SmartEditor.ElementView
     @$el.unbind('mouseup')
     @$el.unbind('mousemove')
 
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("[contenteditable=true]")[0]
-
-  if el? and target_el.tagName=='IMG'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName=='IMG'
     model = new ImgModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new ImgView(
@@ -199,7 +211,8 @@ SmartEditor.factories.push (target_el) =>
 class LinkModel extends SmartEditor.ElementModel
   name: 'Link'
   schema:
-    'src': {type: 'Action', title:'リンクurl'}
+    'src': {type: 'Action', title:'リンクurl', conflicts:[{model:'Editable', schema:'createLink'}]}
+    'remove': {type: 'Action', title:'リンク解除'}
 
 class LinkView extends SmartEditor.ElementView
   initialize: ->
@@ -216,17 +229,27 @@ class LinkView extends SmartEditor.ElementView
     @
 
   closeEdit: =>
+    @model.unbind("src")
+    @model.unbind("remove")
+    @model.unbind("openEdit")
+    @model.unbind("closeEdit")
+    @
+
+  remove: (obj) =>
+    parent = @el.parentNode
+    @$el.after(@el.childNodes)
+    @$el.remove()
+    smartEditor.setTargetElement(parent)
     @
 
   src: (obj) =>
     url = prompt('URL',@$el.attr('href'))
-    @$el.attr('href', url)
+    if url?
+      @$el.attr('href', url)
     @
 
-SmartEditor.factories.push (target_el) =>
-  el = $(target_el).closest("div[contenteditable=true]")[0]
-
-  if el? and target_el.tagName=='A'
+SmartEditor.factories.push (target_el, test_results) =>
+  if test_results['isEditable'] and target_el.tagName=='A'
     model = new LinkModel() 
     model.schema = SmartEditor.utils.clone model.schema
     view = new LinkView(

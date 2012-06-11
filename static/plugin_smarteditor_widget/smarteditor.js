@@ -22,6 +22,8 @@ Exposed global class
 
     SmartEditor.widgetMapper = {};
 
+    SmartEditor.elementTests = {};
+
     SmartEditor.factories = [];
 
     SmartEditor.options = {
@@ -193,12 +195,18 @@ Exposed global class
     };
 
     SmartEditor.prototype.findElementModels = function(targetEl) {
-      var f, models, obj, _i, _len, _ref;
+      var f, func, models, name, obj, testResults, _i, _len, _ref, _ref2;
       models = [];
-      _ref = SmartEditor.factories;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        f = _ref[_i];
-        obj = f(targetEl);
+      testResults = {};
+      _ref = SmartEditor.elementTests;
+      for (name in _ref) {
+        func = _ref[name];
+        testResults[name] = func(targetEl);
+      }
+      _ref2 = SmartEditor.factories;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        f = _ref2[_i];
+        obj = f(targetEl, testResults);
         if (obj != null) models.push(obj);
       }
       return models;
@@ -349,8 +357,7 @@ Exposed global class
 
     MainPanelView.prototype.changeVisibility = function() {
       if (this.model.get('visibility')) {
-        this.$el.show('fast');
-        return this.changePosition();
+        return this.$el.show('fast');
       } else {
         return this.$el.hide('fast');
       }
@@ -395,22 +402,40 @@ Exposed global class
         v = new widgets[schemaObj.type].V({
           model: m
         });
-        return v.$el;
+        return v.el;
       }
     };
 
     MainPanelView.prototype.changeSchemas = function() {
-      var editorModel, hasModel, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _len, _ref, _ref2;
+      var disables, editorModel, hasModel, isConflict, m, name, obj, schema, targetModel, targetModels, w, widget, widgets, _i, _j, _len, _len2, _ref, _ref2, _ref3;
       editorModel = this.model;
       targetModels = editorModel.get("targetModels");
       this.$buttonsEl.empty();
       hasModel = false;
+      disables = [];
       for (_i = 0, _len = targetModels.length; _i < _len; _i++) {
         targetModel = targetModels[_i];
+        _ref = targetModel.schema;
+        for (name in _ref) {
+          obj = _ref[name];
+          if (obj.conflicts && !obj.disabled) {
+            disables = disables.concat(obj.conflicts);
+          }
+        }
+      }
+      isConflict = function(model, schema_name) {
+        var disable, _j, _len2;
+        for (_j = 0, _len2 = disables.length; _j < _len2; _j++) {
+          disable = disables[_j];
+          return (model.name === disable.model) && (schema_name === disable.schema);
+        }
+      };
+      for (_j = 0, _len2 = targetModels.length; _j < _len2; _j++) {
+        targetModel = targetModels[_j];
         if (SmartEditor.widgetMapper[targetModel.name] != null) {
-          _ref = SmartEditor.widgetMapper[targetModel.name];
-          for (widget in _ref) {
-            schema = _ref[widget];
+          _ref2 = SmartEditor.widgetMapper[targetModel.name];
+          for (widget in _ref2) {
+            schema = _ref2[widget];
             widgets = SmartEditor.widgets;
             if (widgets[widget] != null) {
               m = new widgets[widget].M({
@@ -425,10 +450,10 @@ Exposed global class
             }
           }
         } else {
-          _ref2 = targetModel.schema;
-          for (name in _ref2) {
-            obj = _ref2[name];
-            if (!obj.disabled) {
+          _ref3 = targetModel.schema;
+          for (name in _ref3) {
+            obj = _ref3[name];
+            if (!obj.disabled && !isConflict(targetModel, name)) {
               this.$buttonsEl.append(this.createWidget(name, obj, targetModel));
               hasModel = true;
             }

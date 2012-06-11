@@ -62,14 +62,15 @@ class TooltipButtonWidgetView extends Backbone.View
     name = @model.get('name')
     code = SmartEditor.options.menuCSSPrefix + "-" + name
 
-    $buttonEl = $("<a href=\"#\" class=\"ui-btn " + code + "\" title=\"" + name + "\">")
-    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">")
-    $spacerEl = $("<span class=\"spacer\">")
+    $buttonEl = $('<a href=\"#\" class=\"ui-btn ' + code + '\" title=\"' + name + '\"></a>')
+    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>")
+    $spacerEl = $("<span class=\"spacer\"></span>")
     $spacerEl.append (if @renderLabel() then @renderLabel() else '&nbsp;')
 
     $buttonEl.append $spanEl
     $buttonEl.append $spacerEl
     @$el.append($buttonEl)
+
     @
 
   renderLabel: ->
@@ -136,14 +137,14 @@ class TooltipSelectWidgetView extends Backbone.View
     schema = @model.get('schema')
     elModel = @model.get('elModel')
     code = SmartEditor.options.menuCSSPrefix + "-" + name
-    $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + name + '">')
-    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">")
+    $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + name + '"></a>')
+    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>")
     title = if schema['title'] then schema['title'] else '&nbsp;'
     $spacerEl = $("<span class=\"spacer\">#{title}</span>")
     $buttonEl.append $spanEl
     $buttonEl.append $spacerEl
 
-    $submenu = $('<ul class="dropdown-menu">')
+    $submenu = $('<ul class="dropdown-menu"></ul>')
     createWidget = (name, schema, elModel) =>
       v = new TooltipButtonWidgetView
         model: new TooltipButtonWidgetModel
@@ -152,7 +153,7 @@ class TooltipSelectWidgetView extends Backbone.View
           'elModel':elModel
       v.$el
     ($submenu.append createWidget(name, {type:'Action', title:$(obj.label), val:obj.val}, elModel)) for obj in schema.options
-    @el.classList.add('dropdown')
+    @$el.addClass('dropdown')
     @$el.append($buttonEl)
     @$el.append($submenu)
     @
@@ -189,14 +190,14 @@ class DropdownFormsView extends Backbone.View
       form.commit()
 
     code = SmartEditor.options.menuCSSPrefix + "-dropdownforms-" + elModel.name
-    $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + elModel.name + '">')
-    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\">")
+    $buttonEl = $('<a href="#" class="dropdown-toggle ui-btn" data-toggle="dropdown" title="' + elModel.name + '"></a>')
+    $spanEl = $("<span class=\"ui-icon ui-icon-" + name + " " + code + "\"></span>")
     title = if schema['title'] then schema['title'] else '&nbsp;'
     $spacerEl = $("<span class=\"spacer\">#{title}</span>")
     $buttonEl.append $spanEl
     $buttonEl.append $spacerEl
 
-    $submenu = $('<ul class="dropdown-menu">')
+    $submenu = $('<ul class="dropdown-menu"></ul>')
     $submenu.append($form_el)
 
     $form_el.click (e) ->
