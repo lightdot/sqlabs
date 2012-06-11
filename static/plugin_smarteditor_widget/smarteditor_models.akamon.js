@@ -194,6 +194,7 @@
           $data = $($('<div>').append(text));
         }
         dom = this.$el.clone();
+        dom.find('*').removeAttr('contenteditable');
         dom.find('[id^=managed_html_content_block_]').each(function() {
           var name, type;
           name = $(this).attr('id').replace('managed_html_content_block_', '');

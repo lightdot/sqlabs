@@ -89,6 +89,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
         $data = $($('<div>').append(text))
       
       dom = @$el.clone()
+      dom.find('*').removeAttr('contenteditable')
       dom.find('[id^=managed_html_content_block_]').each ->
         name = $(this).attr('id').replace('managed_html_content_block_', '')
         type = $(this).attr('content_type')
