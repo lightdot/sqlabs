@@ -74,6 +74,7 @@
 'Drag me': 'Drag me',
 'E-mail': 'E-mail',
 'Edit': '編集',
+'Edit Failed': '編集に失敗しました',
 'Edited': 'Edited',
 'Email': 'メールアドレス',
 'Errors in form, please check it out.': 'フォームにエラーがあります。ご確認ください。',
