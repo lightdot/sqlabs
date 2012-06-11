@@ -1,3 +1,21 @@
+BROWSER_IS_IE = document.uniqueID?
+
+# IEの時、編集状態の判定を上書きする
+if BROWSER_IS_IE
+  SmartEditor.elementTests.isEditable = (el, test_results) ->
+    t = $(el).closest(".managed_html_content_block.editing")
+    f = $(el).closest(".managed_html_content_block.disable_editing")
+
+    if f.length == 0
+      return t.length > 0
+
+    if t.length > 0
+      return t.find(f).length == 0
+
+    false
+
+
+
 class ManagedHTMLModel extends SmartEditor.ElementModel
 
   defaults:
@@ -17,8 +35,6 @@ class ManagedHTMLModel extends SmartEditor.ElementModel
     'publish': {type: 'Action', title:'公開', disabled:true}
     'history': {type: 'Action', title:'履歴', disabled:true}
     'loading': {type: 'Loading', message: '<div class="managed_html_spinner" style="width:100%;top:12px;left:10px;position:absolute;"></div>'}
-
-BROWSER_IS_IE = document.uniqueID?
 
 
 class ManagedHTMLView extends SmartEditor.ElementView

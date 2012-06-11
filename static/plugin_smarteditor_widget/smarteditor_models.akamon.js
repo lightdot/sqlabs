@@ -5,6 +5,19 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     _this = this;
 
+  BROWSER_IS_IE = document.uniqueID != null;
+
+  if (BROWSER_IS_IE) {
+    SmartEditor.elementTests.isEditable = function(el, test_results) {
+      var f, t;
+      t = $(el).closest(".managed_html_content_block.editing");
+      f = $(el).closest(".managed_html_content_block.disable_editing");
+      if (f.length === 0) return t.length > 0;
+      if (t.length > 0) return t.find(f).length === 0;
+      return false;
+    };
+  }
+
   ManagedHTMLModel = (function(_super) {
 
     __extends(ManagedHTMLModel, _super);
@@ -70,8 +83,6 @@
     return ManagedHTMLModel;
 
   })(SmartEditor.ElementModel);
-
-  BROWSER_IS_IE = document.uniqueID != null;
 
   ManagedHTMLView = (function(_super) {
 
