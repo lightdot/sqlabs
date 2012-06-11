@@ -1,9 +1,22 @@
 (function() {
-  var ManagedHTMLModel, ManagedHTMLView,
+  var BROWSER_IS_IE, ManagedHTMLModel, ManagedHTMLView,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     _this = this;
+
+  BROWSER_IS_IE = document.uniqueID != null;
+
+  if (BROWSER_IS_IE) {
+    SmartEditor.elementTests.isEditable = function(el, test_results) {
+      var f, t;
+      t = $(el).closest(".managed_html_content_block.editing");
+      f = $(el).closest(".managed_html_content_block.disable_editing");
+      if (f.length === 0) return t.length > 0;
+      if (t.length > 0) return t.find(f).length === 0;
+      return false;
+    };
+  }
 
   ManagedHTMLModel = (function(_super) {
 
@@ -120,7 +133,7 @@
       if (this.$el.hasClass('managed_html_content_block_pending') && $('#' + this.el.form_id).length === 0) {
         this.model.schema.publish.disabled = false;
       }
-      if (0 !== this.$el.closest("div[contenteditable=true][id!=" + this.el.id + "]").length && 0 !== this.$el.closest(".handlebars_content_block").find('.managed_html_content_inner').length) {
+      if (0 !== this.$el.parent().closest('.editing').length) {
         _ref3 = ['edit', 'history', 'back', 'commit', 'insert', 'html_editor'];
         for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
           name = _ref3[_k];
@@ -257,7 +270,9 @@
           'loading': false,
           'locked': false
         });
-        $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
+        if (!BROWSER_IS_IE) {
+          $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)", _this.$el).attr("contenteditable", true);
+        }
         _this.$el.addClass('editing');
         _this.$el.find('.managed_html_content_block .managed_html_content_inner').each(function() {
           var $children_block;
