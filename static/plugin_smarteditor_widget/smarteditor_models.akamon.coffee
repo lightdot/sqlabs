@@ -245,6 +245,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
             'locked': false
           $('#'+@el.form_id).remove()
           @$el.removeClass('editing')
+          @$el.addClass('managed_html_content_block_pending')
           smartEditor.setTargetElement(@el)
         dialog.remove()
 

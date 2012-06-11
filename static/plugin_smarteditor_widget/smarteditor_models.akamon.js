@@ -374,6 +374,7 @@
             });
             $('#' + _this.el.form_id).remove();
             _this.$el.removeClass('editing');
+            _this.$el.addClass('managed_html_content_block_pending');
             return smartEditor.setTargetElement(_this.el);
           });
           return dialog.remove();
