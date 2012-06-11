@@ -223,11 +223,12 @@ class ManagedHTMLView extends SmartEditor.ElementView
             'loading': false
             'locked': false
           $('#'+@el.form_id).remove()
-          @$el.addClass('managed_html_content_block_pending')
-          #smartEditor.setTargetElement(@el)
+          @$el.removeClass('editing')
+          smartEditor.setTargetElement(@el)
         dialog.remove()
-        #$('selector').elrte('destroy');
-        #キャンセル時にformなどは消去するべき?
+
+        #キャンセル時にformなどは消去するべき
+        #form.find('textarea:first').elrte('destroy')
       #smartEditor.setTargetElement(@el)
     dialog.show()
     @
