@@ -17,7 +17,10 @@ class ManagedHTMLModel extends SmartEditor.ElementModel
     'publish': {type: 'Action', title:'公開', disabled:true}
     'history': {type: 'Action', title:'履歴', disabled:true}
     'loading': {type: 'Loading', message: '<div class="managed_html_spinner" style="width:100%;top:12px;left:10px;position:absolute;"></div>'}
-    
+
+BROWSER_IS_IE = document.uniqueID?
+
+
 class ManagedHTMLView extends SmartEditor.ElementView
   initialize: ->
     super
@@ -38,7 +41,7 @@ class ManagedHTMLView extends SmartEditor.ElementView
     if @$el.hasClass('managed_html_content_block_pending') and $('#'+@el.form_id).length == 0
       @model.schema.publish.disabled = false
 
-    if 0 != @$el.closest("div[contenteditable=true][id!="+@el.id+"]").length and 0 != @$el.closest(".handlebars_content_block").find('.managed_html_content_inner').length
+    if 0 != this.$el.parent().closest('.editing').length
       @model.schema[name].disabled = true for name in ['edit','history', 'back', 'commit', 'insert', 'html_editor']
       @model.schema[name].disabled = false for name in ['insert', 'html_editor', 'delete']
 
@@ -138,7 +141,8 @@ class ManagedHTMLView extends SmartEditor.ElementView
         'loading': false
         'locked': false
 
-      $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
+      if ! BROWSER_IS_IE
+        $("*:not(.managed_html_content_block .managed_html_content_inner, .managed_html_content)",@$el).attr "contenteditable", true
       @$el.addClass('editing')
 
       # 入れ子のhandlebars要素の編集禁止
