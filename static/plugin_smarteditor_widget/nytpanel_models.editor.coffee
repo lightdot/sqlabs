@@ -64,7 +64,7 @@ class EditableView extends SmartEditor.ElementView
 
     document.execCommand('insertImage',false,'dummy-image');
     dialog = SmartEditor.utils.dialog 'managed_html_image_chooser', "loading..." 
-    managed_html_ajax_page document.location, {"_action": "image_chooser", "_managed_html_image_grid": 'True',}, 'content_managed_html_image_chooser'
+    managed_html_web2py_ajax_page 'get', document.location, {"_action": "image_chooser", "_managed_html_image_grid": 'True',}, 'content_managed_html_image_chooser'
     dialog.show()
     @
     

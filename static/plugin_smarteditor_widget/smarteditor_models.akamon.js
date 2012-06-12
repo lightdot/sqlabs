@@ -504,7 +504,7 @@
       }, this.el.form_id);
       dialog = SmartEditor.utils.dialog('form_history', "loading...");
       self = this;
-      managed_html_ajax_page(document.location, {
+      managed_html_web2py_ajax_page('get', document.location, {
         "_action": "history",
         "_managed_html_history_grid": this.el.content_id
       }, 'content_form_history', function() {
