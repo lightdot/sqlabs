@@ -36,7 +36,7 @@ class TablePermuter(FORM):
         self.table_id, self.keyword, self.submit_button = (
             table_id, keyword, submit_button)
             
-        _files = [URL(APP, 'static', 'plugin_tablepermuter/jquery.tablednd_0_5.js')]
+        _files = [URL(APP, 'static', 'plugin_tablepermuter/jquery.tablednd.0.8.min.js')]
         if renderstyle:
             _files.append(URL(APP, 'static', 'plugin_tablepermuter/tablepermuter.css'))
         _set_files(_files)
