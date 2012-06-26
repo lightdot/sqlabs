@@ -151,6 +151,6 @@ class PaginateInfo(SPAN):
                         dict(total=self.records))
         else:
             inner = XML(self.messages.display_with_span %
-                  dict(start=(self.page - 1) * self.paginate + 1, end=self.page * self.paginate,
+                  dict(start=(self.page - 1) * self.paginate + 1, end=self.page * self.paginate if self.page * self.paginate < self.records else self.records,
                        total=self.records))
         return SPAN(inner, **self.attributes).xml()
